@@ -18,15 +18,11 @@ export default function App() {
   return (
     <div className="mapContainer">
       <Map
-        mapStyle={"https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"}
+        mapStyle={"/style.json"}
         initialViewState={{
           longitude: 22,
           latitude: 27,
           zoom: 1.8
-        }}
-        style={{
-          width: '100dvw',
-          height: '100dvh'
         }}
       >
         <DeckGLOverlay layers={[]} interleaved />
