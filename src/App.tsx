@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Map, useControl } from "react-map-gl/maplibre";
 import { MapboxOverlay } from '@deck.gl/mapbox';
 
@@ -15,10 +16,12 @@ function DeckGLOverlay(props: MapboxOverlayProps) {
 
 
 export default function App() {
+  const [hasActiveData, _] = useState(false);
+
   return (
     <div className="mapContainer">
       <Map
-        mapStyle={"/style.json"}
+        mapStyle={hasActiveData ? '/basemap-data.style.json' : '/basemap-context.style.json'}
         initialViewState={{
           longitude: 22,
           latitude: 27,
