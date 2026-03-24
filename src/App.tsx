@@ -43,6 +43,7 @@ export default function App() {
           pitch: 0
         }}
         bearing={0}
+        maxPitch={45}
       >
         <DeckGLOverlay layers={layers} interleaved />
       </Map>

@@ -1,5 +1,6 @@
 {
   "name": "atlasl2",
+  "description": "An interactive data engineering project showcasing linguistic communicability of countries across the world with a user-selected combination of L2 languages.",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
