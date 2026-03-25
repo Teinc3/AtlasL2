@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Map, useControl } from "react-map-gl/maplibre";
 import { MapboxOverlay } from '@deck.gl/mapbox';
 import { GeoJsonLayer } from '@deck.gl/layers';
 
-import { getCommunicabilityColor, getLogElevation } from "./utils";
+import { getCommunicabilityColor, getElevation } from "./utils";
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './App.css'
 
 import type { MapboxOverlayProps } from "@deck.gl/mapbox";
 import type CountryFeatureProperties from "./types/geojson.types";
+import mockLinguisticProfiles from "./api";
 
 
 function DeckGLOverlay(props: MapboxOverlayProps) {
@@ -22,7 +23,7 @@ function DeckGLOverlay(props: MapboxOverlayProps) {
 export default function App() {
   const [hasActiveData, _] = useState(false);
 
-  const layers = [
+  const layers = useMemo(() => [
     new GeoJsonLayer<CountryFeatureProperties>({
       id: 'country-fill-layer',
       data: 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson',
@@ -31,7 +32,7 @@ export default function App() {
       extruded: true,
       wireframe: false,
       getFillColor: getCommunicabilityColor,
-      getElevation: getLogElevation,
+      getElevation,
     }),
     new GeoJsonLayer<CountryFeatureProperties>({
       id: 'golden-wall-layer',
@@ -45,7 +46,7 @@ export default function App() {
       getLineWidth: 1,
       lineWidthMinPixels: 0.6,
     })
-  ]
+  ], [mockLinguisticProfiles]);
 
   return (
     <div className="mapContainer">
