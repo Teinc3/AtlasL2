@@ -3,10 +3,13 @@ import { Map, useControl } from "react-map-gl/maplibre";
 import { MapboxOverlay } from '@deck.gl/mapbox';
 import { GeoJsonLayer } from '@deck.gl/layers';
 
+import { getCommunicabilityColor, getLogElevation } from "./utils";
+
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './App.css'
 
 import type { MapboxOverlayProps } from "@deck.gl/mapbox";
+import type CountryFeatureProperties from "./types/geojson.types";
 
 
 function DeckGLOverlay(props: MapboxOverlayProps) {
@@ -20,15 +23,27 @@ export default function App() {
   const [hasActiveData, _] = useState(false);
 
   const layers = [
-    new GeoJsonLayer({
-      id: 'golden-border-layer',
+    new GeoJsonLayer<CountryFeatureProperties>({
+      id: 'country-fill-layer',
       data: 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson',
+      filled: true,
+      stroked: false,
+      extruded: true,
+      wireframe: false,
+      getFillColor: getCommunicabilityColor,
+      getElevation: getLogElevation,
+    }),
+    new GeoJsonLayer<CountryFeatureProperties>({
+      id: 'golden-wall-layer',
+      data: 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson',
+      filled: false,
       stroked: true,
+      extruded: false,
+      wireframe: false,
+      getLineColor: [255, 215, 0, 220],
       lineWidthUnits: 'pixels',
       getLineWidth: 1,
-      getLineColor: [255, 215, 0, 200],
-      lineWidthMinPixels: 0.25,
-      beforeId: 'place_continent',
+      lineWidthMinPixels: 0.6,
     })
   ]
 
@@ -43,9 +58,9 @@ export default function App() {
           pitch: 0
         }}
         bearing={0}
-        maxPitch={45}
+        maxPitch={30}
       >
-        <DeckGLOverlay layers={layers} interleaved />
+        <DeckGLOverlay layers={layers} />
       </Map>
     </div>
   )
