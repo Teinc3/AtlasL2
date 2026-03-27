@@ -1,0 +1,96 @@
+.hoverPanelWrapper {
+  position: fixed;
+  z-index: 10;
+}
+
+.hoverPanelContainer {
+  width: 200px;
+  background: var(--panel-bg);
+  backdrop-filter: var(--blur-medium, blur(4px));
+  border: var(--panel-border);
+  border-radius: 12px;
+  padding: 16px;
+  color: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  user-select: none;
+}
+
+.hoverHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+}
+
+.hoverHeaderGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hoverCloseBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--text-light, #aaa);
+  cursor: pointer;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+  transform: translateY(-3px);
+}
+
+.hoverCloseBtn:hover {
+  color: white;
+}
+
+.hoverFlag {
+  font-size: 1.25rem;
+}
+
+.hoverCountryName {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.hoverDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.hoverRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.hoverLabel {
+  color: #aaa;
+}
+
+.hoverValue {
+  font-weight: 500;
+}
+
+.hoverActionBtn {
+  width: 100%;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.hoverActionBtn:hover {
+  opacity: 0.85;
+}

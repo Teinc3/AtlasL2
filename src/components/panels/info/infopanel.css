@@ -100,7 +100,7 @@
 
 .infoState h3 {
   margin: 0 0 12px 0;
-  color: #ccc;
+  color: var(--dimmed-white);
   font-size: 1rem;
 }
 
@@ -111,7 +111,7 @@
 }
 
 .infoState ul {
-  color: #ddd;
+  color: var(--dimmed-white);
 }
 
 .infoState li {
@@ -198,7 +198,7 @@
 .barLabel {
   width: 40px;
   font-size: 0.85rem;
-  color: #ccc;
+  color: var(--dimmed-white);
 }
 
 .barTrack {

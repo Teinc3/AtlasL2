@@ -71,7 +71,7 @@
 }
 
 .section h3 {
-  color: #ddd;
+  color: var(--dimmed-white);
 }
 
 .chips {
