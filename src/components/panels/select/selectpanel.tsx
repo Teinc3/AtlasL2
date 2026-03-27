@@ -12,13 +12,17 @@ export default function SelectPanel() {
   const removeCountry = (country: string) => setCountries(countries.filter(c => c !== country));
 
   return (
-    <div className={`selectPanel ${isOpen ? 'open' : ''}`}>
-      <div className="panelContent">
-        <div className="panelHeader">
+    <div className={`selectPanelContainer ${isOpen ? 'open' : ''}`}>
+      <div className="selectPanelHeader">
+        {isOpen && 
           <h2 className="panelLogo">AtlasL2</h2>
-          <button className="closeButton" onClick={() => setIsOpen(false)}>—</button>
+        }
+        <button className="icon-btn shift-up" onClick={() => setIsOpen(!isOpen)}>
+          {isOpen ? '—' : '☰'}
+          </button>
         </div>
-        
+      
+      <div className="selectPanelContent">
         <div className="section">
           <h3>Active Languages</h3>
           <div className="inputWrapper">
@@ -49,12 +53,6 @@ export default function SelectPanel() {
           </div>
         </div>
       </div>
-
-      {!isOpen && (
-        <div className="panelStud" onClick={() => setIsOpen(true)}>
-          ☰
-        </div>
-      )}
     </div>
   )
 }

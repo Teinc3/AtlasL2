@@ -4,4 +4,23 @@ body {
   overflow-x: hidden;
   background: #0e0e0e;
   font-family: 'Montserrat', sans-serif;
+
+  --panel-border: 3px solid rgba(255, 255, 255, 0.35);
+  --morph-curve: cubic-bezier(0.4, 0, 0.2, 1);
+  --panel-bg: rgba(35, 35, 35, 0.95);
+  --primary: #9d4edd;
+  --bg-dark: #1a1a1a;
+}
+
+.icon-btn {
+  width: 48px;
+  aspect-ratio: 1 / 1;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

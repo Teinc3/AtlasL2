@@ -9,7 +9,7 @@ export default function InfoPanel() {
 
   return (
     <div className={`infoPanelContainer ${isOpen ? 'open' : ''}`}>
-      <button className="infoButton" onClick={() => setIsOpen(!isOpen)}>
+      <button className="icon-btn" onClick={() => setIsOpen(!isOpen)}>
         {isOpen ? '—' : 'i'}
       </button>
 

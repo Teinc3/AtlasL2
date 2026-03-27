@@ -1,61 +1,70 @@
-.selectPanel {
+.selectPanelContainer {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
+  align-self: flex-start;
+  margin: 1rem;
   color: white;
-}
-
-.panelContent {
-  display: none;
-  width: 320px;
-  padding: 24px;
-  background: rgba(35, 35, 35, 0.95);
+  background: var(--panel-bg);
   backdrop-filter: blur(4px);
-  border-bottom-right-radius: 8px;
-  outline: 3px solid rgba(255, 255, 255, 0.35);
-}
-
-.selectPanel.open .panelContent {
-  display: block;
-}
-
-.panelStud {
-  margin-top: 1rem;
-  margin-left: 1rem;
-  width: 3rem;
-  aspect-ratio: 1 / 1;
-  background: rgba(35, 35, 35, 0.95);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
   border-radius: 8px;
-  border: 3px solid rgba(255, 255, 255, 0.35);
-  font-size: 1.5rem;
+  outline: var(--panel-border);
+  transition: border-radius 0.4s var(--morph-curve), 
+              margin 0.4s var(--morph-curve);
+  transform-origin: top left;
 }
 
-.panelHeader {
+.selectPanelContainer.open {
+  margin: 0;
+  border-radius: 0 0 16px 0;
+}
+
+.shift-up {
+  transform: translateY(-3px);
+}
+
+.selectPanelHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .panelLogo {
-  color: #9d4edd;
+  color: var(--primary);
   margin: 0;
+  padding-left: 24px;
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 0;
+  max-width: 0;
+  transition: max-width 0.4s var(--morph-curve), opacity 0.3s var(--morph-curve);
 }
 
-.closeButton {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0;
-  transform: translateY(-5px);
+.selectPanelContainer.open .panelLogo {
+  opacity: 1;
+  max-width: 250px;
 }
 
+.selectPanelContent {
+  width: 0;
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 24px;
+  box-sizing: border-box;
+  opacity: 0;
+  transition: max-height 0.5s var(--morph-curve), 
+              width 0.4s var(--morph-curve), 
+              opacity 0.3s var(--morph-curve), 
+              padding 0.4s var(--morph-curve);
+}
+
+.selectPanelContainer.open .selectPanelContent {
+  width: 320px;
+  max-height: 100vh;
+  padding: 0 24px 24px 24px;
+  opacity: 1;
+}
 
 .section {
   margin-bottom: 32px;
@@ -72,7 +81,7 @@
 }
 
 .chip {
-  background: #9d4edd;
+  background: var(--primary);
   color: white;
   padding: 4px 10px;
   border-radius: 12px;
@@ -95,7 +104,7 @@
 .inputWrapper input {
   width: 100%;
   padding: 10px;
-  background: #1a1a1a;
+  background: var(--bg-dark);
   color: white;
   border: 1px solid #555;
   border-radius: 6px;
@@ -105,5 +114,5 @@
 
 .inputWrapper input:focus {
   outline: none;
-  border-color: #9d4edd;
+  border-color: var(--primary);
 }

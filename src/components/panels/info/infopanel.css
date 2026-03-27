@@ -1,34 +1,20 @@
 .infoPanelContainer {
-  --morph-curve: cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   align-self: flex-start;
   margin: 1rem;
   color: white;
-  background: rgba(35, 35, 35, 0.95);
+  background: var(--panel-bg);
   backdrop-filter: blur(2px);
   border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: var(--panel-border);
   transition: border-radius 0.4s var(--morph-curve);
   transform-origin: top right;
 }
 
 .infoPanelContainer.open {
   border-radius: 16px;
-}
-
-.infoButton {
-  width: 48px;
-  aspect-ratio: 1 / 1;
-  background: transparent;
-  border: none;
-  font-size: 1.5rem;
-  color: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .infoPanelContent {
@@ -59,7 +45,7 @@
 }
 
 .devStateSwitcher button {
-  background: #1a1a1a;
+  background: var(--bg-dark);
   color: gold;
   border: 1px solid gold;
   padding: 4px 12px;
@@ -68,7 +54,7 @@
 }
 
 .devStateSwitcher button.active {
-  background: #9d4edd;
+  background: var(--primary);
   color: white;
 }
 
@@ -109,7 +95,7 @@
 
 .infoState h2 {
   margin: 0 0 16px 0;
-  color: #9d4edd;
+  color: var(--primary);
 }
 
 .infoState h3 {
@@ -167,7 +153,7 @@
 .metricValue {
   font-size: 3rem;
   font-weight: bold;
-  color: #9d4edd;
+  color: var(--primary);
 }
 
 .metricLabel {
@@ -183,8 +169,8 @@
   margin: 0 auto 32px auto;
   border-radius: 50%;
   border: 20px solid #a32f2f;
-  border-bottom-color: #9d4edd;
-  border-right-color: #9d4edd;
+  border-bottom-color: var(--primary);
+  border-right-color: var(--primary);
   transform: rotate(45deg);
 }
 
@@ -224,6 +210,6 @@
 
 .barFill {
   height: 100%;
-  background: #9d4edd;
+  background: var(--primary);
   border-radius: 8px;
 }
