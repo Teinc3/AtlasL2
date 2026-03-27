@@ -19,24 +19,43 @@
 }
 
 .panelStud {
-  width: 32px;
-  height: 48px;
+  margin-top: 1rem;
+  margin-left: 1rem;
+  width: 3rem;
+  aspect-ratio: 1 / 1;
   background: rgba(35, 35, 35, 0.95);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border-bottom-right-radius: 8px;
+  border-radius: 8px;
   border: 3px solid rgba(255, 255, 255, 0.35);
-  border-left: none;
-  border-top: none;
+  font-size: 1.5rem;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
 }
 
 .panelLogo {
   color: #9d4edd;
-  margin: 0 0 32px 0;
+  margin: 0;
 }
+
+.closeButton {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  transform: translateY(-5px);
+}
+
 
 .section {
   margin-bottom: 32px;

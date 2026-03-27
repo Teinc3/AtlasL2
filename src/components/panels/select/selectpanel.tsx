@@ -14,7 +14,10 @@ export default function SelectPanel() {
   return (
     <div className={`selectPanel ${isOpen ? 'open' : ''}`}>
       <div className="panelContent">
-        <h2 className="panelLogo">AtlasL2</h2>
+        <div className="panelHeader">
+          <h2 className="panelLogo">AtlasL2</h2>
+          <button className="closeButton" onClick={() => setIsOpen(false)}>—</button>
+        </div>
         
         <div className="section">
           <h3>Active Languages</h3>
@@ -47,9 +50,11 @@ export default function SelectPanel() {
         </div>
       </div>
 
-      <div className="panelStud" onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? '◀' : '▶'}
-      </div>
+      {!isOpen && (
+        <div className="panelStud" onClick={() => setIsOpen(true)}>
+          ☰
+        </div>
+      )}
     </div>
   )
 }
