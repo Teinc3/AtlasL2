@@ -1,20 +1,19 @@
 import { useState, useMemo, useRef, useCallback } from "react";
 import { Map, useControl } from "react-map-gl/maplibre";
-import { MapboxOverlay } from '@deck.gl/mapbox';
 import { GeoJsonLayer } from '@deck.gl/layers';
+import { MapboxOverlay } from '@deck.gl/mapbox';
 
 import mockLinguisticProfiles from "./api";
 import { SelectPanel, InfoPanel, HoverPanel } from "./components/panels";
-import { getCommunicabilityColor, getElevation } from "./utils";
+import { getCommunicabilityColor, getElevation, default as useAtlasContext } from "./utils";
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './App.css'
 
 import type { Feature, Geometry } from "geojson";
-import type { MapboxOverlayProps } from "@deck.gl/mapbox";
 import type { PickingInfo } from "@deck.gl/core";
-import type CountryFeatureProperties from "./types/geojson.types";
-import type { HoverState } from "./types/props.types";
+import type { MapboxOverlayProps } from "@deck.gl/mapbox";
+import type { CountryFeatureProperties, HoverState } from "./types";
 
 
 function DeckGLOverlay(props: MapboxOverlayProps) {
@@ -25,7 +24,8 @@ function DeckGLOverlay(props: MapboxOverlayProps) {
 
 
 export default function App() {
-  const [hasActiveData, _] = useState(false);
+  const { selectedLanguages, selectedCountries } = useAtlasContext();
+  const hasActiveData = selectedLanguages.length > 0 || selectedCountries.length > 0;
 
   const [hoverInfo, setHoverInfo] = useState<HoverState>({
     isVisible: false,
@@ -142,7 +142,7 @@ export default function App() {
           countryName={"France"}
           population={67000000}
           continent="Europe"
-          isInRegion={true}
+          isInRegion={selectedCountries.includes("France")}
           onClose={closeHoverPanel}
           onMouseEnter={() => setHoverInfo(prev => ({ ...prev, isLocked: true }))}
           onMouseLeave={closeHoverPanel}

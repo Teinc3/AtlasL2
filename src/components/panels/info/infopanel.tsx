@@ -2,7 +2,7 @@ import { useState } from "react"
 
 import "./infopanel.css"
 
-import type { BasePanelProps } from "../../../types/props.types";
+import type { BasePanelProps } from "../../../types";
 
 
 export default function InfoPanel(props: BasePanelProps) {
