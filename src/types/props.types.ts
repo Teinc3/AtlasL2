@@ -19,3 +19,8 @@ export interface HoverState {
   /* Tracks if the user has hovered enough to lock the panel */
   isLocked: boolean;
 }
+
+export interface BasePanelProps {
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+}

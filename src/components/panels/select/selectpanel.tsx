@@ -2,8 +2,10 @@ import { useState } from "react";
 
 import "./selectpanel.css"
 
+import type { BasePanelProps } from "../../../types/props.types";
 
-export default function SelectPanel() {
+
+export default function SelectPanel(props: BasePanelProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [languages, setLanguages] = useState(["English"]);
   const [countries, setCountries] = useState(["France", "Germany"]);
@@ -12,7 +14,11 @@ export default function SelectPanel() {
   const removeCountry = (country: string) => setCountries(countries.filter(c => c !== country));
 
   return (
-    <div className={`selectPanelContainer ${isOpen ? 'open' : ''}`}>
+    <div 
+      className={`selectPanelContainer ${isOpen ? 'open' : ''}`}
+      onMouseEnter={props.onMouseEnter}
+      onMouseLeave={props.onMouseLeave}
+    >
       <div className="selectPanelHeader">
         {isOpen && 
           <h2 className="panelLogo">AtlasL2</h2>

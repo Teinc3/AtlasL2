@@ -60,7 +60,7 @@ export default function App() {
         if (countryId) {
           hoverTimerRef.current = setTimeout(() => {
             setHoverInfo(s => ({ ...s, isVisible: true, isLocked: true }));
-          }, 1800);
+          }, 1500);
         } else {
           return { ...prev, isVisible: false, countryId: null, isLocked: false };
         }
@@ -133,8 +133,8 @@ export default function App() {
         </Map>
       </div>
       <div className="uiOverlay">
-        <SelectPanel />
-        <InfoPanel />
+        <SelectPanel onMouseEnter={closeHoverPanel} />
+        <InfoPanel onMouseEnter={closeHoverPanel} />
         <HoverPanel 
           isVisible={hoverInfo.isVisible}
           x={hoverInfo.x}

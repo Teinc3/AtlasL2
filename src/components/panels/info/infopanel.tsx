@@ -2,13 +2,19 @@ import { useState } from "react"
 
 import "./infopanel.css"
 
+import type { BasePanelProps } from "../../../types/props.types";
 
-export default function InfoPanel() {
+
+export default function InfoPanel(props: BasePanelProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeState, setActiveState] = useState(0);
 
   return (
-    <div className={`infoPanelContainer ${isOpen ? 'open' : ''}`}>
+    <div 
+      className={`infoPanelContainer ${isOpen ? 'open' : ''}`}
+      onMouseEnter={props.onMouseEnter}
+      onMouseLeave={props.onMouseLeave}
+    >
       <button className="icon-btn" onClick={() => setIsOpen(!isOpen)}>
         {isOpen ? '—' : 'i'}
       </button>
