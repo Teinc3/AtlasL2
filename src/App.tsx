@@ -3,6 +3,7 @@ import { Map, useControl } from "react-map-gl/maplibre";
 import { MapboxOverlay } from '@deck.gl/mapbox';
 import { GeoJsonLayer } from '@deck.gl/layers';
 
+import { SelectPanel, InfoPanel} from "./components/panels";
 import { getCommunicabilityColor, getElevation } from "./utils";
 
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -33,6 +34,9 @@ export default function App() {
       wireframe: false,
       getFillColor: getCommunicabilityColor,
       getElevation,
+      autoHighlight: true,
+      highlightColor: [255, 255, 255, 50],
+      pickable: true,
     }),
     new GeoJsonLayer<CountryFeatureProperties>({
       id: 'golden-wall-layer',
@@ -49,20 +53,29 @@ export default function App() {
   ], [mockLinguisticProfiles]);
 
   return (
-    <div className="mapContainer">
-      <Map
-        mapStyle={hasActiveData ? '/basemap-data.style.json' : '/basemap-context.style.json'}
-        initialViewState={{
-          longitude: 22,
-          latitude: 27,
-          zoom: 1.8,
-          pitch: 0
-        }}
-        bearing={0}
-        maxPitch={30}
-      >
-        <DeckGLOverlay layers={layers} />
-      </Map>
+    <div className="appContainer">
+      <div className="mapContainer">
+        <Map
+          mapStyle={hasActiveData ? '/basemap-data.style.json' : '/basemap-context.style.json'}
+          initialViewState={{
+            longitude: 22,
+            latitude: 27,
+            zoom: 1.8,
+            pitch: 0
+          }}
+          bearing={0}
+          maxPitch={30}
+          attributionControl={{
+            compact: false
+          }}
+        >
+          <DeckGLOverlay layers={layers} />
+        </Map>
+      </div>
+      <div className="uiOverlay">
+        <SelectPanel />
+        <InfoPanel />
+      </div>
     </div>
   )
 }

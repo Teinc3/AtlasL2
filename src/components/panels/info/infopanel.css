@@ -1,0 +1,15 @@
+.infoButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+
+  width: 2rem;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  border-color: #fff;
+}
+
+/* .infoPanel {
+  
+} */

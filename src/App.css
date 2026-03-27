@@ -1,4 +1,20 @@
 .mapContainer {
+  height: 100dvh;
 	width: 100dvw;
-	height: 100dvh;
+}
+
+.uiOverlay {
+  position: absolute;
+  z-index: 10;
+  inset: 0;
+  
+  pointer-events: none;
+  
+  display: flex;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.uiOverlay > * {
+  pointer-events: auto;
 }

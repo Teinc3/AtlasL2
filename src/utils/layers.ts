@@ -14,8 +14,9 @@ export function getCommunicabilityColor(
     return [0, 0, 0, 0];
   }
 
-  const red = Math.round(255 * (1 - profile.communicabilityIndex));
-  const green = Math.round(255 * profile.communicabilityIndex);
+  // piecewise 1OH for better saturation
+  const red = Math.round(255 * Math.min(1, 2 * (1 - profile.communicabilityIndex)));
+  const green = Math.round(255 * Math.min(1, 2 * profile.communicabilityIndex));
 
   return [red, green, 0, 160];
 }

@@ -1,0 +1,90 @@
+.selectPanel {
+  display: flex;
+  align-items: flex-start;
+  color: white;
+}
+
+.panelContent {
+  display: none;
+  width: 320px;
+  padding: 24px;
+  background: rgba(35, 35, 35, 0.95);
+  backdrop-filter: blur(4px);
+  border-bottom-right-radius: 8px;
+  outline: 3px solid rgba(255, 255, 255, 0.35);
+}
+
+.selectPanel.open .panelContent {
+  display: block;
+}
+
+.panelStud {
+  width: 32px;
+  height: 48px;
+  background: rgba(35, 35, 35, 0.95);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-bottom-right-radius: 8px;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  border-left: none;
+  border-top: none;
+}
+
+.panelLogo {
+  color: #9d4edd;
+  margin: 0 0 32px 0;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.section h3 {
+  color: #ddd;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  background: #9d4edd;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: Arial, sans-serif;
+  font-size: 90%;
+}
+
+.chip button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0;
+  transform: translateY(-1px);
+}
+
+.inputWrapper input {
+  width: 100%;
+  padding: 10px;
+  background: #1a1a1a;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 6px;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+
+.inputWrapper input:focus {
+  outline: none;
+  border-color: #9d4edd;
+}
