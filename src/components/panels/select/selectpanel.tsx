@@ -35,9 +35,9 @@ export default function SelectPanel() {
         </div>
 
         <div className="section">
-          <h3>Selected Countries</h3>
+          <h3>Selected Regions</h3>
           <div className="inputWrapper">
-            <input type="text" placeholder="Search countries..." />
+            <input type="text" placeholder="Search regions..." />
             {/* Dropdown would position here */}
           </div>
           <div className="chips">

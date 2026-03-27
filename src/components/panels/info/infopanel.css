@@ -1,15 +1,229 @@
-.infoButton {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  z-index: 10;
-
-  width: 2rem;
-  aspect-ratio: 1/1;
-  border-radius: 50%;
-  border-color: #fff;
+.infoPanelContainer {
+  --morph-curve: cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  align-self: flex-start;
+  margin: 1rem;
+  color: white;
+  background: rgba(35, 35, 35, 0.95);
+  backdrop-filter: blur(2px);
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  transition: border-radius 0.4s var(--morph-curve);
+  transform-origin: top right;
 }
 
-/* .infoPanel {
-  
-} */
+.infoPanelContainer.open {
+  border-radius: 16px;
+}
+
+.infoButton {
+  width: 48px;
+  aspect-ratio: 1 / 1;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.infoPanelContent {
+  width: 0;
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 24px;
+  box-sizing: border-box;
+  opacity: 0;
+  transition: max-height 0.5s var(--morph-curve), 
+              width 0.4s var(--morph-curve), 
+              opacity 0.3s var(--morph-curve), 
+              padding 0.4s var(--morph-curve);
+}
+
+.infoPanelContainer.open .infoPanelContent {
+  width: 400px;
+  max-height: 100vh;
+  padding: 0 24px 24px 24px;
+  opacity: 1;
+}
+
+.devStateSwitcher {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  justify-content: center;
+}
+
+.devStateSwitcher button {
+  background: #1a1a1a;
+  color: gold;
+  border: 1px solid gold;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.devStateSwitcher button.active {
+  background: #9d4edd;
+  color: white;
+}
+
+/* State Transitions */
+.stateWrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s var(--morph-curve);
+}
+
+.stateWrapper.active {
+  grid-template-rows: 1fr;
+}
+
+.stateContent {
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.3s var(--morph-curve);
+}
+
+.stateWrapper.active .stateContent {
+  opacity: 1;
+  transition: opacity 0.4s var(--morph-curve) 0.1s;
+}
+
+/* Common Typography & Layout */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.mt-4 {
+  margin-top: 24px;
+}
+
+.infoState h2 {
+  margin: 0 0 16px 0;
+  color: #9d4edd;
+}
+
+.infoState h3 {
+  margin: 0 0 12px 0;
+  color: #ccc;
+  font-size: 1rem;
+}
+
+.infoState h4 {
+  margin: 0 0 12px 0;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.infoState ul {
+  color: #ddd;
+}
+
+.infoState li {
+  margin-bottom: 8px;
+}
+
+/* State 0: Helper */
+.helperState p {
+  color: #aaa;
+  font-style: italic;
+  text-align: center;
+}
+
+/* State 1: Profile */
+.statBlock {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+}
+
+.statBlock .label {
+  color: #888;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.statBlock .value {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* States 2 & 3: Metrics & Charts */
+.bigMetric {
+  display: flex;
+  flex-direction: column;
+  margin: 24px 0;
+}
+
+.metricValue {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #9d4edd;
+}
+
+.metricLabel {
+  color: #aaa;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+.cssDonutPlaceholder {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 32px auto;
+  border-radius: 50%;
+  border: 20px solid #a32f2f;
+  border-bottom-color: #9d4edd;
+  border-right-color: #9d4edd;
+  transform: rotate(45deg);
+}
+
+.breakdownList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.barChartPlaceholder {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.barRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.barLabel {
+  width: 40px;
+  font-size: 0.85rem;
+  color: #ccc;
+}
+
+.barTrack {
+  flex-grow: 1;
+  height: 16px;
+  background: #2a2a2a;
+  border-radius: 8px;
+}
+
+.barFill {
+  height: 100%;
+  background: #9d4edd;
+  border-radius: 8px;
+}
