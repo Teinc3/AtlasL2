@@ -1,19 +1,17 @@
-import { useState, useMemo, useRef, useCallback } from "react";
-import { Map, useControl } from "react-map-gl/maplibre";
+import { useMemo, useRef } from "react";
+import { Map, useControl, MapRef } from "react-map-gl/maplibre";
 import { GeoJsonLayer } from '@deck.gl/layers';
 import { MapboxOverlay } from '@deck.gl/mapbox';
 
 import mockLinguisticProfiles from "./api";
 import { SelectPanel, InfoPanel, HoverPanel } from "./components/panels";
-import { getCommunicabilityColor, getElevation, default as useAtlasContext } from "./utils";
+import { getCommunicabilityColor, getElevation, useMapInteractions, useAtlasContext } from "./utils";
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './App.css'
 
-import type { Feature, Geometry } from "geojson";
-import type { PickingInfo } from "@deck.gl/core";
 import type { MapboxOverlayProps } from "@deck.gl/mapbox";
-import type { CountryFeatureProperties, HoverState } from "./types";
+import type { CountryFeatureProperties } from "./types";
 
 
 function DeckGLOverlay(props: MapboxOverlayProps) {
@@ -24,64 +22,19 @@ function DeckGLOverlay(props: MapboxOverlayProps) {
 
 
 export default function App() {
+  const mapRef = useRef<MapRef>(null);
   const { selectedLanguages, selectedCountries } = useAtlasContext();
   const hasActiveData = selectedLanguages.length > 0 || selectedCountries.length > 0;
 
-  const [hoverInfo, setHoverInfo] = useState<HoverState>({
-    isVisible: false,
-    x: 0,
-    y: 0,
-    countryId: null,
-    isLocked: false
-  });
-
-  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const currentHoveredCountryRef = useRef<string | null>(null);
-
-  const handleHover = useCallback((
-    info: PickingInfo<Feature<Geometry, CountryFeatureProperties>>
-  ) => {
-    const { object, x, y } = info;
-    const countryId = object?.properties?.ADM0_A3 || null;
-
-    setHoverInfo(prev => {
-      // If we are fully locked and hovered onto the tooltip container, return
-      if (prev.isLocked && !countryId) {
-        return prev;
-      }
-
-      // We hovered onto empty space or another country while panel is not locked
-      if (countryId !== currentHoveredCountryRef.current) {
-        if (hoverTimerRef.current) {
-          clearTimeout(hoverTimerRef.current);
-        }
-        currentHoveredCountryRef.current = countryId;
-
-        if (countryId) {
-          hoverTimerRef.current = setTimeout(() => {
-            setHoverInfo(s => ({ ...s, isVisible: true, isLocked: true }));
-          }, 1500);
-        } else {
-          return { ...prev, isVisible: false, countryId: null, isLocked: false };
-        }
-      }
-      
-      // Update coords if panel isn't locked
-      if (!prev.isLocked) {
-        return { ...prev, x, y, countryId, isVisible: false };
-      }
-
-      return prev;
-    });
-  }, []);
-
-  const closeHoverPanel = () => {
-    setHoverInfo(prev => ({ ...prev, isVisible: false, isLocked: false, countryId: null }));
-    currentHoveredCountryRef.current = null;
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current);
-    }
-  };
+  const {
+    hoverInfo,
+    setHoverInfo,
+    handleHover,
+    handleClick,
+    handleMapInteractionStart,
+    handleMapInteractionEnd,
+    closeHoverPanel
+  } = useMapInteractions(mapRef);
 
   const layers = useMemo(() => [
     new GeoJsonLayer<CountryFeatureProperties>({
@@ -96,7 +49,8 @@ export default function App() {
       autoHighlight: true,
       highlightColor: [255, 255, 255, 50],
       pickable: true,
-      onHover: handleHover
+      onHover: handleHover,
+      onClick: handleClick
     }),
     new GeoJsonLayer<CountryFeatureProperties>({
       id: 'golden-wall-layer',
@@ -110,12 +64,13 @@ export default function App() {
       getLineWidth: 1,
       lineWidthMinPixels: 0.6,
     })
-  ], [mockLinguisticProfiles]);
+  ], [mockLinguisticProfiles, handleHover, handleClick]);
 
   return (
     <div className="appContainer">
       <div className="mapContainer">
         <Map
+          ref={mapRef}
           mapStyle={hasActiveData ? '/basemap-data.style.json' : '/basemap-context.style.json'}
           initialViewState={{
             longitude: 22,
@@ -123,6 +78,12 @@ export default function App() {
             zoom: 1.8,
             pitch: 0
           }}
+          onMoveStart={handleMapInteractionStart}
+          onMoveEnd={handleMapInteractionEnd}
+          onZoomStart={handleMapInteractionStart}
+          onZoomEnd={handleMapInteractionEnd}
+          onPitchStart={handleMapInteractionStart}
+          onPitchEnd={handleMapInteractionEnd}
           bearing={0}
           maxPitch={30}
           attributionControl={{
@@ -142,7 +103,7 @@ export default function App() {
           countryName={"France"}
           population={67000000}
           continent="Europe"
-          isInRegion={selectedCountries.includes("France")}
+          communicabilityIndex={0.65}
           onClose={closeHoverPanel}
           onMouseEnter={() => setHoverInfo(prev => ({ ...prev, isLocked: true }))}
           onMouseLeave={closeHoverPanel}

@@ -1,4 +1,6 @@
-import { useState } from "react"
+import { useState } from "react";
+
+import { useAtlasContext } from "../../../utils";
 
 import "./infopanel.css"
 
@@ -6,7 +8,7 @@ import type { BasePanelProps } from "../../../types";
 
 
 export default function InfoPanel(props: BasePanelProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isInfoPanelOpen: isOpen, setIsInfoPanelOpen: setIsOpen } = useAtlasContext();
   const [activeState, setActiveState] = useState(0);
 
   return (

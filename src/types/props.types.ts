@@ -5,7 +5,8 @@ export interface HoverPanelProps {
   population: number;
   continent: string;
   isVisible: boolean;
-  isInRegion: boolean;
+  /* This is optional bcz there may not be any selected langs */
+  communicabilityIndex?: number;
   onClose: () => void;
   onMouseEnter: () => void;
   onMouseLeave: () => void;

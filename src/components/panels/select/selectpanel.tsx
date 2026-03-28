@@ -1,6 +1,4 @@
-import { useState } from "react";
-
-import useAtlasContext from "../../../utils";
+import { useAtlasContext } from "../../../utils";
 
 import "./selectpanel.css"
 
@@ -8,13 +6,13 @@ import type { BasePanelProps } from "../../../types";
 
 
 export default function SelectPanel(props: BasePanelProps) {
-  const [isOpen, setIsOpen] = useState(true);
-  
   const { 
     selectedLanguages: languages, 
     selectedCountries: countries, 
     removeLanguage, 
-    removeCountry 
+    removeCountry,
+    isSelectPanelOpen: isOpen,
+    setIsSelectPanelOpen: setIsOpen
   } = useAtlasContext();
 
   return (

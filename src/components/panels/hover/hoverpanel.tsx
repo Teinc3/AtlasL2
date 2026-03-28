@@ -10,7 +10,7 @@ export default function HoverPanel(props: HoverPanelProps) {
 
   const {
     x, y,
-    countryName, population, continent, isVisible, isInRegion,
+    countryName, population, continent, isVisible, communicabilityIndex,
     onClose, onMouseEnter, onMouseLeave
   } = props;
 
@@ -56,11 +56,13 @@ export default function HoverPanel(props: HoverPanelProps) {
             <span className="hoverLabel">Region:</span>
             <span className="hoverValue">{continent}</span>
           </div>
+          {communicabilityIndex !== undefined && (
+            <div className="hoverRow">
+              <span className="hoverLabel">Communicability:</span>
+              <span className="hoverValue">{(communicabilityIndex * 100).toFixed(1)}%</span>
+            </div>
+          )}
         </div>
-
-        <button className="hoverActionBtn">
-          {isInRegion ? 'Remove from Selected Regions' : 'Add to Selected Regions'}
-        </button>
       </div>
     </div>
   );
