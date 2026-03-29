@@ -5,7 +5,7 @@ body {
   background: #0e0e0e;
   font-family: 'Montserrat', sans-serif;
 
-  --panel-border: 3px solid rgba(255, 255, 255, 0.35);
+  --panel-border: 3px solid rgba(176, 139, 255, 0.80);
   --morph-curve: cubic-bezier(0.4, 0, 0.2, 1);
   --panel-bg: rgba(35, 35, 35, 0.95);
   --primary: #9d4edd;
