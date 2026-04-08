@@ -1,41 +1,26 @@
 {
   "name": "atlasl2",
-  "description": "An interactive data engineering project showcasing linguistic communicability of countries across the world with a user-selected combination of L2 languages.",
+  "description": "An interactive data engineering project showcasing L2 communicability across the world with a user-selected combination of languages.",
   "version": "0.0.0",
-  "type": "module",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "maplibre-gl": "^5.21.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "react-map-gl": "^8.1.0",
-    "@deck.gl/geo-layers": "^9.2.11",
-    "@deck.gl/layers": "^9.2.11",
-    "@deck.gl/react": "^9.2.11",
-    "deck.gl": "^9.2.11"
-
+    "dev:client": "npm run dev -w @atlasl2/client",
+    "dev:server": "npm run dev -w @atlasl2/server",
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\""
   },
   "devDependencies": {
-    "@babel/core": "^7.29.0",
-    "@eslint/js": "^9.39.4",
-    "@rolldown/plugin-babel": "^0.1.8",
-    "@types/babel__core": "^7.20.5",
-    "@types/node": "^24.12.0",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.0",
-    "babel-plugin-react-compiler": "^1.0.0",
+    "concurrently": "^9.2.1",
     "eslint": "^9.39.4",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.5.2",
+    "@eslint/js": "^9.39.4",
+    "@types/node": "^24.12.0",
     "globals": "^17.4.0",
     "typescript": "~5.9.3",
-    "typescript-eslint": "^8.56.1",
-    "vite": "^8.0.0"
+    "typescript-eslint": "^8.56.1"
   }
 }

@@ -1,0 +1,10 @@
+{
+  "name": "@atlasl2/shared",
+  "description": "Shared utilities and types consumed by the client and server workspaces",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "countries-list": "^3.3.0",
+    "iso-639-3": "^3.0.0"
+  }
+}
