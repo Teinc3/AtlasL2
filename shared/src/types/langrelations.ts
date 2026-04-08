@@ -1,23 +1,23 @@
-type LanguageRelationConfig = LanguageRelation[];
+export type LanguageRelationConfig = LanguageRelation[];
 
-type LanguageRelation = AsymmetricEdge | TransitiveHub | NonTransitiveHub;
+export type LanguageRelation = AsymmetricEdge | TransitiveHub | NonTransitiveHub;
 
 /** All languages here form a cartesian product of connectivities with each other */
-interface TransitiveHub extends BaseScore {
+export interface TransitiveHub extends BaseScore {
   languages: string[];
 }
 
 /** All parents here form cartesian products of connectivities with children */
-interface NonTransitiveHub extends BaseScore {
+export interface NonTransitiveHub extends BaseScore {
   parent: string[];
   children: string[];
 }
 
-interface BaseScore {
+export interface BaseScore {
   score: number;
 }
 
-interface AsymmetricEdge {
+export interface AsymmetricEdge {
   parent: string;
   child: string;
   /** Downstream connectivity (parent understanding of child, Receptive reach) */

@@ -3,13 +3,11 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
+  "exports": null,
   "scripts": {
     "dev": "tsx watch src/main.ts"
   },
   "dependencies": {
     "fastify": "^5.8.4"
-  },
-  "devDependencies": {
-    "tsx": "^4.21.0"
   }
 }

@@ -2,9 +2,21 @@
   "name": "@atlasl2/shared",
   "description": "Shared utilities and types consumed by the client and server workspaces",
   "version": "0.0.0",
+  "type": "module",
   "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/types/index.ts",
+  "scripts": {
+    "combine": "tsx ../scripts/combine_datasets.ts",
+    "generate": ":"
+  },
   "dependencies": {
     "countries-list": "^3.3.0",
     "iso-639-3": "^3.0.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
   }
 }
