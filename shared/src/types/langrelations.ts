@@ -1,3 +1,8 @@
+export type LanguageRelationMap = Record<string, Record<string, number>>;
+
+
+// Raw Relation configuration
+
 export type LanguageRelationConfig = LanguageRelation[];
 
 export type LanguageRelation = AsymmetricEdge | TransitiveHub | NonTransitiveHub;

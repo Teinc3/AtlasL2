@@ -10,7 +10,7 @@
   "types": "./src/types/index.ts",
   "scripts": {
     "combine": "tsx ../scripts/combine_datasets.ts",
-    "generate": ":"
+    "expand": "tsx ../scripts/expand_edges.ts"
   },
   "dependencies": {
     "countries-list": "^3.3.0",

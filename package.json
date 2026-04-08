@@ -13,7 +13,8 @@
     "dev:client": "npm run dev -w @atlasl2/client",
     "dev:server": "npm run dev -w @atlasl2/server",
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
-    "data:combine": "npm run combine -w @atlasl2/shared"
+    "scripts:combine": "npm run combine -w @atlasl2/shared",
+    "scripts:expand": "npm run expand -w @atlasl2/shared"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
