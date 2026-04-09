@@ -13,8 +13,8 @@
     "dev:client": "npm run dev -w @atlasl2/client",
     "dev:server": "npm run dev -w @atlasl2/server",
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
-    "scripts:combine": "npm run combine -w @atlasl2/shared",
-    "scripts:expand": "npm run expand -w @atlasl2/shared"
+    "data:combine": "tsx --tsconfig scripts/tsconfig.scripts.json scripts/combine_datasets.ts",
+    "data:expand": "tsx --tsconfig scripts/tsconfig.scripts.json scripts/expand_edges.ts"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
@@ -22,7 +22,12 @@
     "@eslint/js": "^9.39.4",
     "@types/node": "^24.12.0",
     "globals": "^17.4.0",
+    "tsx": "^4.21.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.56.1"
+  },
+  "dependencies": {
+    "countries-list": "^3.3.0",
+    "iso-639-3": "^3.0.0"
   }
 }

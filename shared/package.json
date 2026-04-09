@@ -7,16 +7,5 @@
   "exports": {
     ".": "./src/index.ts"
   },
-  "types": "./src/types/index.ts",
-  "scripts": {
-    "combine": "tsx ../scripts/combine_datasets.ts",
-    "expand": "tsx ../scripts/expand_edges.ts"
-  },
-  "dependencies": {
-    "countries-list": "^3.3.0",
-    "iso-639-3": "^3.0.0"
-  },
-  "devDependencies": {
-    "tsx": "^4.21.0"
-  }
+  "types": "./src/types/index.ts"
 }

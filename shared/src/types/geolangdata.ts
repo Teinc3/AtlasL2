@@ -1,11 +1,35 @@
-export type CombinedLanguageData<LangISO3Codes extends string = string> = {
-  [LangISO3Code in LangISO3Codes]: LanguageData<LangISO3Code>;
+// JSON Dataset for Country->Language and Language->Country mapping
+export interface CombinedData {
+  metadata: {
+    generatedAt: string;
+    sourceHash: string;
+  };
+  languages: CombinedLanguageData<true>;
+  countries: CombinedCountryData;
 }
 
-export interface LanguageData<LangISO3Code extends string = string> {
-  language: LangISO3Code;
-  countries: Record<string, CountryLanguageData>;
-}
+// Combined Language Data, for source referencing
+
+export type MatrixMap<
+  OuterCode extends string,
+  InnerCode extends string,
+  isCompiledData extends boolean,
+> = {
+  [Outer in OuterCode]: {
+    [Inner in InnerCode]: isCompiledData extends true ? number : CountryLanguageData;
+  };
+};
+
+export type CombinedLanguageData<
+  isCompiledData extends boolean = false,
+  LangISO3Codes extends string = string,
+  CountryISO3Codes extends string = string,
+> = MatrixMap<LangISO3Codes, CountryISO3Codes, isCompiledData>;
+
+export type CombinedCountryData<
+  CountryISO3Codes extends string = string,
+  LangISO3Codes extends string = string,
+> = MatrixMap<CountryISO3Codes, LangISO3Codes, true>;
 
 export interface CountryLanguageData extends BaseSourceData {
   ethnologue: EthnologueSourceData;
