@@ -28,3 +28,19 @@ export interface WorldBankCountryRow {
   population: number;
   gdp: GDPMetadata;
 }
+
+
+export type LanguageMetadataMap = Record<string, LanguageMetadata>;
+export type LanguageBaseMetadataMap = Record<string, LanguageBaseMetadata>;
+
+export interface LanguageMetadata extends LanguageBaseMetadata {
+  globalSpeakers: number;
+}
+
+export interface LanguageBaseMetadata {
+  id: string;
+  displayName: string;
+  family: string;
+  /** The language cluster which the language belongs to (i.e. Romance, Oghuz) */
+  cluster?: string;
+}

@@ -6,13 +6,19 @@ import { parse } from 'csv-parse/sync';
 import { countries } from 'countries-list';
 import countries3to2 from 'countries-list/minimal/countries.3to2.min.json' with { type: 'json' };
 
-import type { CountryMetadataMap, CountryOfficialScript, WorldBankCountryRow } from '@atlasl2/shared';
+import type { 
+  CountryMetadataMap, CountryOfficialScript, WorldBankCountryRow,
+  LanguageBaseMetadataMap, LanguageMetadataMap
+} from '@atlasl2/shared';
 
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, '..');
 const worldBankCsvPath = path.join(repoRoot, 'data/countries/countries_worldbank.csv');
 const outputPath = path.join(repoRoot, 'data/country_metadata.json');
+const combinedDataPath = path.join(repoRoot, 'data/combined_data.json');
+const languageBasePath = path.join(repoRoot, 'data/languages/metadata_base.json');
+const languageOutputPath = path.join(repoRoot, 'data/language_metadata.json');
 
 const CSV_HEADERS = {
   year: 'Time',
@@ -34,6 +40,14 @@ function parseNumericValue(input: string): number | null {
 
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function sumCountrySpeakers(countryTotals: Record<string, number> | undefined): number {
+  if (!countryTotals) {
+    return 0;
+  }
+
+  return Object.values(countryTotals).reduce((total, value) => total + value, 0);
 }
 
 function resolveScriptForLanguage(countryAlpha2: string | undefined, targetIso3: string): string | null {
@@ -136,18 +150,42 @@ function parseWorldBankCsv(csvText: string): Map<string, WorldBankCountryRow> {
   return result;
 }
 
+function parseLanguageBase(jsonText: string): LanguageBaseMetadataMap {
+  return JSON.parse(jsonText) as LanguageBaseMetadataMap;
+}
+
 async function main() {
+  const existingOutputs = [];
+
   try {
     await access(outputPath);
-    console.error(`Error: Output file already exists at '${path.relative(repoRoot, outputPath)}'.`);
-    process.exit(1);
+    existingOutputs.push(outputPath);
   } catch {
     // expected when output does not exist
   }
 
+  try {
+    await access(languageOutputPath);
+    existingOutputs.push(languageOutputPath);
+  } catch {
+    // expected when output does not exist
+  }
+
+  if (existingOutputs.length > 0) {
+    for (const filePath of existingOutputs) {
+      console.error(`Error: Output file already exists at '${path.relative(repoRoot, filePath)}'.`);
+    }
+    process.exit(1);
+  }
+
   const worldBankCsvRaw = await readFile(worldBankCsvPath, 'utf8');
+  const combinedDataRaw = await readFile(combinedDataPath, 'utf8');
+  const languageBaseRaw = await readFile(languageBasePath, 'utf8');
   const worldBankRows = parseWorldBankCsv(worldBankCsvRaw);
+  const combinedData = JSON.parse(combinedDataRaw) as { languages: Record<string, Record<string, number>> };
+  const languageBase = parseLanguageBase(languageBaseRaw);
   const countryMetadata: CountryMetadataMap = {};
+  const languageMetadata: LanguageMetadataMap = {};
 
   for (const [countryAlpha3, row] of worldBankRows.entries()) {
     const countryAlpha2 = countries3to2[countryAlpha3 as keyof typeof countries3to2];
@@ -185,8 +223,17 @@ async function main() {
     };
   }
 
+  for (const [languageIso3, languageBaseRow] of Object.entries(languageBase)) {
+    languageMetadata[languageIso3] = {
+      ...languageBaseRow,
+      globalSpeakers: sumCountrySpeakers(combinedData.languages[languageIso3]),
+    };
+  }
+
   await writeFile(outputPath, `${JSON.stringify(countryMetadata, null, 2)}\n`, 'utf8');
+  await writeFile(languageOutputPath, `${JSON.stringify(languageMetadata, null, 2)}\n`, 'utf8');
   console.log(`Successfully generated ${Object.keys(countryMetadata).length} countries into '${path.relative(repoRoot, outputPath)}'.`);
+  console.log(`Successfully generated ${Object.keys(languageMetadata).length} languages into '${path.relative(repoRoot, languageOutputPath)}'.`);
 }
 
 
