@@ -1,4 +1,4 @@
-# Atlas L2
+# AtlasL2
 
 An interactive data engineering project showcasing linguistic communicability of countries across the world with a user-selected combination of L2 languages.
 
