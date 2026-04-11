@@ -5,13 +5,14 @@ import { MapboxOverlay } from '@deck.gl/mapbox';
 
 import mockLinguisticProfiles from "./api";
 import { SelectPanel, InfoPanel, HoverPanel } from "./components/panels";
-import { getCommunicabilityColor, getElevation, useMapInteractions } from "./utils";
+import { useMapInteractions } from "./hooks";
+import { getCommunicabilityColor, getElevation } from "./utils";
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './App.css'
 
 import type { MapboxOverlayProps } from "@deck.gl/mapbox";
-import type { CountryFeatureProperties } from "./types";
+import type { CountryFeatureProperties, HoverState } from "./types";
 
 
 function DeckGLOverlay(props: MapboxOverlayProps) {
@@ -89,7 +90,7 @@ export default function App() {
           continent="Europe"
           communicabilityIndex={0.65}
           onClose={closeHoverPanel}
-          onMouseEnter={() => setHoverInfo(prev => ({ ...prev, isLocked: true }))}
+          onMouseEnter={() => setHoverInfo((prev: HoverState) => ({ ...prev, isLocked: true }))}
           onMouseLeave={closeHoverPanel}
         />
       </div>

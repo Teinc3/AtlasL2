@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useAtlasContext } from "../../../utils";
+import { useAtlasContext } from "../../../context";
 
 import "./infopanel.css"
 

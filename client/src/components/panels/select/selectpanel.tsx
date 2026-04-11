@@ -1,4 +1,4 @@
-import { useAtlasContext } from "../../../utils";
+import { useAtlasContext } from "../../../context";
 
 import "./selectpanel.css"
 

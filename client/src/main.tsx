@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import App from './App.tsx'
-import { AtlasProvider } from './utils'
+import { AtlasProvider } from './context'
 
 import './index.css'
 
