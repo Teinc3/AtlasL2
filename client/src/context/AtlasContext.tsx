@@ -1,7 +1,9 @@
 import {
-  createContext, useCallback, useContext, useState,
-  type ReactNode
+	createContext, useCallback, useContext, useState,
+	type ReactNode
 } from 'react';
+
+import { useIndices, useMetadata } from '../hooks';
 
 import type { AtlasContextType } from '../types';
 
@@ -10,12 +12,26 @@ const AtlasContext = createContext<AtlasContextType | undefined>(undefined);
 
 
 export function AtlasProvider({ children }: { children: ReactNode }) {
+	const {
+		countryMetadata,
+		languageMetadata,
+		isLoading: metadataLoading,
+		error: metadataError,
+	} = useMetadata();
+
 	const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['English']);
 	const [selectedCountries, setSelectedCountries] = useState<string[]>(['Germany']);
 	const [focusedCountryId, setFocusedCountryId] = useState<string | null>(null);
 
 	const [isSelectPanelOpen, setIsSelectPanelOpen] = useState<boolean>(true);
 	const [isInfoPanelOpen, setIsInfoPanelOpen] = useState<boolean>(false);
+
+	const {
+		reach, gap,
+		isLoadingReach: reachLoading,
+		isLoadingGap: gapLoading,
+		reachError, gapError,
+	} = useIndices(selectedLanguages, selectedCountries, languageMetadata, countryMetadata);
 
 	const addLanguage = useCallback((lang: string) => {
 		setSelectedLanguages((prevLangs) => {
@@ -73,6 +89,16 @@ export function AtlasProvider({ children }: { children: ReactNode }) {
 				removeCountry,
 				focusedCountryId,
 				setFocusedCountryId,
+				countryMetadata,
+				languageMetadata,
+				metadataLoading,
+				metadataError,
+				reach,
+				gap,
+				reachLoading,
+				gapLoading,
+				reachError,
+				gapError,
 				isSelectPanelOpen,
 				setIsSelectPanelOpen,
 				isInfoPanelOpen,

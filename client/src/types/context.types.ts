@@ -1,3 +1,6 @@
+import type { CountryMetadataMap, GapResponse, LanguageMetadataMap, ReachResponse } from '@atlasl2/shared';
+
+
 export default interface AtlasContextType {
   selectedLanguages: string[];
   addLanguage: (lang: string) => void;
@@ -16,4 +19,18 @@ export default interface AtlasContextType {
   // Active focus
   focusedCountryId: string | null;
   setFocusedCountryId: (id: string | null) => void;
+
+  // Metadata
+  countryMetadata: CountryMetadataMap;
+  languageMetadata: LanguageMetadataMap;
+  metadataLoading: boolean;
+  metadataError: string | null;
+
+  // API indices
+  reach: ReachResponse | null;
+  gap: GapResponse | null;
+  reachLoading: boolean;
+  gapLoading: boolean;
+  reachError: string | null;
+  gapError: string | null;
 }
