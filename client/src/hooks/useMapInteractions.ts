@@ -6,7 +6,6 @@ import { getFeatureBounds } from '../utils';
 
 import type { Feature, Geometry } from 'geojson';
 import type { PickingInfo } from '@deck.gl/core';
-import type { MjolnirEvent } from 'mjolnir.js';
 import type { MapRef } from 'react-map-gl/maplibre';
 import type { CountryFeatureProperties, HoverState } from '../types';
 
@@ -16,7 +15,6 @@ export default function useMapInteractions(mapRef: RefObject<MapRef | null>) {
 		selectedCountries,
 		addCountry,
 		removeCountry,
-		setSelectedCountries,
 		setFocusedCountryId,
 	} = useAtlasContext();
 
@@ -85,27 +83,23 @@ export default function useMapInteractions(mapRef: RefObject<MapRef | null>) {
 		isMovingRef.current = false;
 	}, []);
 
-	const handleClick = useCallback((info: PickingInfo<Feature<Geometry, CountryFeatureProperties>>, event: MjolnirEvent) => {
+	const handleClick = useCallback((info: PickingInfo<Feature<Geometry, CountryFeatureProperties>>) => {
 		const { object, coordinate } = info;
 		const countryId = object?.properties?.ADM0_A3 || null;
 
 		closeHoverPanel();
 
 		if (countryId) {
-			const isShiftPressed = event.srcEvent.shiftKey;
 			const targetCountryID = countryId;
 			setFocusedCountryId(countryId);
 
-			if (isShiftPressed) {
-				if (selectedCountries.includes(targetCountryID)) {
-					removeCountry(targetCountryID);
-				} else {
-					addCountry(targetCountryID);
-				}
+			if (selectedCountries.includes(targetCountryID)) {
+				removeCountry(targetCountryID);
 			} else {
-				setSelectedCountries([targetCountryID]);
+				const hadNoCountriesSelected = selectedCountries.length === 0;
+				addCountry(targetCountryID);
 
-				if (mapRef.current) {
+				if (hadNoCountriesSelected && mapRef.current) {
 					const bounds = object ? getFeatureBounds(object.geometry) : null;
 
 					if (bounds) {
@@ -124,7 +118,6 @@ export default function useMapInteractions(mapRef: RefObject<MapRef | null>) {
 		selectedCountries,
 		addCountry,
 		removeCountry,
-		setSelectedCountries,
 		setFocusedCountryId,
 		mapRef,
 		closeHoverPanel,

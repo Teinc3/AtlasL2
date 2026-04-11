@@ -37,27 +37,6 @@
   opacity: 1;
 }
 
-.devStateSwitcher {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
-  justify-content: center;
-}
-
-.devStateSwitcher button {
-  background: var(--bg-dark);
-  color: gold;
-  border: 1px solid gold;
-  padding: 4px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.devStateSwitcher button.active {
-  background: var(--primary);
-  color: white;
-}
-
 /* State Transitions */
 .stateWrapper {
   display: grid;
@@ -160,18 +139,31 @@
   color: #aaa;
   font-size: 0.85rem;
   text-transform: uppercase;
-  margin-top: 8px;
+  margin: 1rem 0 2rem;
 }
 
-.cssDonutPlaceholder {
+.scoreDonut {
   width: 150px;
   height: 150px;
-  margin: 0 auto 32px auto;
+  margin: 1rem auto 1rem;
+  background: conic-gradient(#2ebf6f var(--score-pct, 0%), #a32f2f 0);
   border-radius: 50%;
-  border: 20px solid #a32f2f;
-  border-bottom-color: var(--primary);
-  border-right-color: var(--primary);
-  transform: rotate(45deg);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.scoreDonutInner {
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  background: #171a1f;
+  box-shadow: 0 0 0 2px #171a1f;
+  display: grid;
+  place-items: center;
+  font-size: 2.1rem;
+  font-weight: bold;
+  color: var(--primary);
 }
 
 .breakdownList {

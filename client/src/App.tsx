@@ -24,7 +24,7 @@ function DeckGLOverlay(props: MapboxOverlayProps) {
 
 export default function App() {
   const mapRef = useRef<MapRef>(null);
-  const { countryMetadata, reach } = useAtlasContext();
+  const { countryMetadata, reach, selectedCountries } = useAtlasContext();
   const {
     hoverInfo,
     setHoverInfo,
@@ -42,18 +42,18 @@ export default function App() {
     stroked: false,
     extruded: true,
     wireframe: false,
-    getFillColor: feature => getCommunicabilityColor(feature, reach),
-    getElevation: feature => getElevation(feature, countryMetadata, reach),
+    getFillColor: feature => getCommunicabilityColor(feature, reach, selectedCountries),
+    getElevation: feature => getElevation(feature, countryMetadata, reach, selectedCountries),
     updateTriggers: {
-      getFillColor: [reach],
-      getElevation: [reach, countryMetadata],
+      getFillColor: [reach, selectedCountries],
+      getElevation: [reach, countryMetadata, selectedCountries],
     },
     autoHighlight: true,
     highlightColor: [255, 255, 255, 50],
     pickable: true,
     onHover: handleHover,
     onClick: handleClick
-  })], [countryMetadata, reach, handleHover, handleClick]);
+  })], [countryMetadata, reach, selectedCountries, handleHover, handleClick]);
 
   const hoveredCountryID = hoverInfo.countryId;
   const hoveredCountry = hoveredCountryID ? countryMetadata[hoveredCountryID] : undefined;
@@ -83,7 +83,7 @@ export default function App() {
             compact: false
           }}
         >
-          {reach && <DeckGLOverlay layers={layers} />}
+          <DeckGLOverlay layers={layers} />
         </Map>
       </div>
       <div className="uiOverlay">

@@ -1,10 +1,9 @@
-import { useState } from "react";
-
 import { useAtlasContext } from "../../../context";
 import { toCountryDisplayName, toLanguageDisplayName } from "../../../utils";
 
 import "./infopanel.css"
 
+import type { CSSProperties } from "react";
 import type { BasePanelProps } from "../../../types";
 
 
@@ -19,8 +18,8 @@ export default function InfoPanel(props: BasePanelProps) {
     languageMetadata,
     reach,
     metadataLoading,
+    reachLoading,
   } = useAtlasContext();
-  const [activeState, setActiveState] = useState(0);
 
   const primaryCountryID = focusedCountryId ?? selectedCountries[0] ?? null;
   const primaryCountry = primaryCountryID ? countryMetadata[primaryCountryID] : null;
@@ -35,6 +34,20 @@ export default function InfoPanel(props: BasePanelProps) {
   const topContributors = Object.entries(reach?.breakdown ?? {})
     .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
     .slice(0, 3);
+  const hasLanguages = selectedLanguages.length > 0;
+  const hasCountries = selectedCountries.length > 0;
+  const hasSingleCountry = selectedCountries.length === 1;
+  const showS0 = !hasLanguages && !hasCountries;
+  const showS1 = !hasLanguages && hasCountries;
+  const showLanguageView = hasLanguages;
+  const languageViewTitle = !hasCountries
+    ? 'Global Linguistic Footprint'
+    : hasSingleCountry
+      ? `Selected Region: ${primaryCountry?.name ?? toCountryDisplayName(selectedCountries[0], countryMetadata)}`
+      : 'Selected Region';
+  const circleScore = hasSingleCountry ? regionalScore : globalScore;
+  const circleScorePct = circleScore !== undefined ? Math.round(circleScore * 100) : null;
+  const scoreDonutStyle = { '--score-pct': `${circleScorePct ?? 0}%` } as CSSProperties;
 
   return (
     <div 
@@ -47,18 +60,7 @@ export default function InfoPanel(props: BasePanelProps) {
       </button>
 
       <div className="infoPanelContent">
-        {/* Temporary State Switcher for Dev */}
-        <div className="devStateSwitcher">
-          {[0,1,2,3].map(s => (
-            <button 
-              key={s} 
-              onClick={() => setActiveState(s)} 
-              className={activeState === s ? 'active' : ''}
-            >S{s}</button>
-          ))}
-        </div>
-
-        <div className={`stateWrapper ${activeState === 0 ? 'active' : ''}`}>
+        <div className={`stateWrapper ${showS0 ? 'active' : ''}`}>
           <div className="stateContent">
             <div className="infoState helperState">
               <p>
@@ -69,7 +71,7 @@ export default function InfoPanel(props: BasePanelProps) {
           </div>
         </div>
 
-        <div className={`stateWrapper ${activeState === 1 ? 'active' : ''}`}>
+        <div className={`stateWrapper ${showS1 ? 'active' : ''}`}>
           <div className="stateContent">
             <div className="infoState">
               <h2>{primaryCountry?.name ?? 'No Country Selected'}</h2>
@@ -95,49 +97,44 @@ export default function InfoPanel(props: BasePanelProps) {
           </div>
         </div>
 
-        <div className={`stateWrapper ${activeState === 2 ? 'active' : ''}`}>
+        <div className={`stateWrapper ${showLanguageView ? 'active' : ''}`}>
           <div className="stateContent">
             <div className="infoState text-center">
-              <h3>Selected Region: {primaryCountry?.name ?? 'None'}</h3>
-              <div className="bigMetric">
-                <span className="metricValue">
-                  {regionalScore !== undefined ? `${Math.round(regionalScore * 100)}/100` : 'N/A'}
-                </span>
-                <span className="metricLabel">Regional Communicability</span>
-              </div>
-              <div className="cssDonutPlaceholder"></div>
-              <ul className="breakdownList text-left">
-                <li>Reachable: {regionalReachablePopulation.toLocaleString()}</li>
-                <li>Unreachable: {regionalUnreachablePopulation.toLocaleString()}</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+              <h3>{languageViewTitle}</h3>
 
-        <div className={`stateWrapper ${activeState === 3 ? 'active' : ''}`}>
-          <div className="stateContent">
-            <div className="infoState text-center">
-              <h3>Global Linguistic Footprint</h3>
-              <div className="bigMetric">
-                <span className="metricValue">
-                  {globalScore !== undefined ? `${Math.round(globalScore * 100)}/100` : 'N/A'}
-                </span>
-                <span className="metricLabel">Global Communicability</span>
+              <div
+                className="scoreDonut"
+                style={scoreDonutStyle}
+              >
+                <div className="scoreDonutInner">
+                  {reachLoading ? '...' : (circleScorePct !== null ? circleScorePct : 'N/A')}
+                </div>
               </div>
-              <div className="cssDonutPlaceholder"></div>
-              
-              <h4 className="text-left mt-4">Top Contributing Regions</h4>
-              <div className="barChartPlaceholder">
-                {topContributors.length === 0 && <div className="barRow">No data yet.</div>}
-                {topContributors.map(([countryID, score]) => (
-                  <div className="barRow" key={countryID}>
-                    <span className="barLabel">{toCountryDisplayName(countryID, countryMetadata)}</span>
-                    <div className="barTrack">
-                      <div className="barFill" style={{ width: `${Math.round(score * 100)}%` }}></div>
-                    </div>
+              <div className="metricLabel">Communicability Index</div>
+
+              {hasSingleCountry ? (
+                <>
+                  <ul className="breakdownList text-left mt-4">
+                    <li>Reachable: {regionalReachablePopulation.toLocaleString()}</li>
+                    <li>Unreachable: {regionalUnreachablePopulation.toLocaleString()}</li>
+                  </ul>
+                </>
+              ) : (
+                <>
+                  <h4 className="text-left mt-4">Top Contributing Regions</h4>
+                  <div className="barChartPlaceholder">
+                    {topContributors.length === 0 && <div className="barRow">No data yet.</div>}
+                    {topContributors.map(([countryID, score]) => (
+                      <div className="barRow" key={countryID}>
+                        <span className="barLabel">{toCountryDisplayName(countryID, countryMetadata)}</span>
+                        <div className="barTrack">
+                          <div className="barFill" style={{ width: `${Math.round(score * 100)}%` }}></div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </>
+              )}
             </div>
           </div>
         </div>
