@@ -10,7 +10,7 @@ export default function HoverPanel(props: HoverPanelProps) {
 
   const {
     x, y,
-    countryName, population, continent, isVisible, communicabilityIndex,
+    countryName, population, continent, flag, isVisible, communicabilityIndex,
     onClose, onMouseEnter, onMouseLeave
   } = props;
 
@@ -41,7 +41,7 @@ export default function HoverPanel(props: HoverPanelProps) {
       <div className="hoverPanelContainer">
         <div className="hoverHeader">
           <div className="hoverHeaderGroup">
-            <span className="hoverFlag">🇫🇷</span>
+            <span className="hoverFlag">{flag ?? '🏳️'}</span>
             <h3 className="hoverCountryName">{countryName}</h3>
           </div>
           <button className="hoverCloseBtn" onClick={onClose}>—</button>

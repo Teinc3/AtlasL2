@@ -12,7 +12,13 @@ import type { CountryFeatureProperties, HoverState } from '../types';
 
 
 export default function useMapInteractions(mapRef: RefObject<MapRef | null>) {
-	const { selectedCountries, addCountry, removeCountry, setSelectedCountries } = useAtlasContext();
+	const {
+		selectedCountries,
+		addCountry,
+		removeCountry,
+		setSelectedCountries,
+		setFocusedCountryId,
+	} = useAtlasContext();
 
 	const [hoverInfo, setHoverInfo] = useState<HoverState>({
 		isVisible: false,
@@ -87,16 +93,17 @@ export default function useMapInteractions(mapRef: RefObject<MapRef | null>) {
 
 		if (countryId) {
 			const isShiftPressed = event.srcEvent.shiftKey;
-			const targetCountry = 'France';
+			const targetCountryID = countryId;
+			setFocusedCountryId(countryId);
 
 			if (isShiftPressed) {
-				if (selectedCountries.includes(targetCountry)) {
-					removeCountry(targetCountry);
+				if (selectedCountries.includes(targetCountryID)) {
+					removeCountry(targetCountryID);
 				} else {
-					addCountry(targetCountry);
+					addCountry(targetCountryID);
 				}
 			} else {
-				setSelectedCountries([targetCountry]);
+				setSelectedCountries([targetCountryID]);
 
 				if (mapRef.current) {
 					const bounds = object ? getFeatureBounds(object.geometry) : null;
@@ -113,7 +120,15 @@ export default function useMapInteractions(mapRef: RefObject<MapRef | null>) {
 				}
 			}
 		}
-	}, [selectedCountries, addCountry, removeCountry, setSelectedCountries, mapRef, closeHoverPanel]);
+	}, [
+		selectedCountries,
+		addCountry,
+		removeCountry,
+		setSelectedCountries,
+		setFocusedCountryId,
+		mapRef,
+		closeHoverPanel,
+	]);
 
 	return {
 		hoverInfo,

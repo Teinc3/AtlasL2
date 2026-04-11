@@ -19,8 +19,8 @@ export function AtlasProvider({ children }: { children: ReactNode }) {
 		error: metadataError,
 	} = useMetadata();
 
-	const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['English']);
-	const [selectedCountries, setSelectedCountries] = useState<string[]>(['Germany']);
+	const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['ENG']);
+	const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
 	const [focusedCountryId, setFocusedCountryId] = useState<string | null>(null);
 
 	const [isSelectPanelOpen, setIsSelectPanelOpen] = useState<boolean>(true);
@@ -31,7 +31,7 @@ export function AtlasProvider({ children }: { children: ReactNode }) {
 		isLoadingReach: reachLoading,
 		isLoadingGap: gapLoading,
 		reachError, gapError,
-	} = useIndices(selectedLanguages, selectedCountries, languageMetadata, countryMetadata);
+	} = useIndices(selectedLanguages, selectedCountries);
 
 	const addLanguage = useCallback((lang: string) => {
 		setSelectedLanguages((prevLangs) => {

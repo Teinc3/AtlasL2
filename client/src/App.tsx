@@ -3,9 +3,9 @@ import { Map, useControl, MapRef } from "react-map-gl/maplibre";
 import { GeoJsonLayer } from '@deck.gl/layers';
 import { MapboxOverlay } from '@deck.gl/mapbox';
 
-import mockLinguisticProfiles from "./api";
 import { SelectPanel, InfoPanel, HoverPanel } from "./components/panels";
 import { useMapInteractions } from "./hooks";
+import { useAtlasContext } from "./context";
 import { getCommunicabilityColor, getElevation } from "./utils";
 
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -24,7 +24,7 @@ function DeckGLOverlay(props: MapboxOverlayProps) {
 
 export default function App() {
   const mapRef = useRef<MapRef>(null);
-
+  const { countryMetadata, reach } = useAtlasContext();
   const {
     hoverInfo,
     setHoverInfo,
@@ -42,14 +42,22 @@ export default function App() {
     stroked: false,
     extruded: true,
     wireframe: false,
-    getFillColor: getCommunicabilityColor,
-    getElevation,
+    getFillColor: feature => getCommunicabilityColor(feature, reach),
+    getElevation: feature => getElevation(feature, countryMetadata, reach),
+    updateTriggers: {
+      getFillColor: [reach],
+      getElevation: [reach, countryMetadata],
+    },
     autoHighlight: true,
     highlightColor: [255, 255, 255, 50],
     pickable: true,
     onHover: handleHover,
     onClick: handleClick
-  })], [mockLinguisticProfiles, handleHover, handleClick]);
+  })], [countryMetadata, reach, handleHover, handleClick]);
+
+  const hoveredCountryID = hoverInfo.countryId;
+  const hoveredCountry = hoveredCountryID ? countryMetadata[hoveredCountryID] : undefined;
+  const hoveredReach = hoveredCountryID ? reach?.breakdown[hoveredCountryID] : undefined;
 
   return (
     <div className="appContainer">
@@ -75,7 +83,7 @@ export default function App() {
             compact: false
           }}
         >
-          <DeckGLOverlay layers={layers} />
+          {reach && <DeckGLOverlay layers={layers} />}
         </Map>
       </div>
       <div className="uiOverlay">
@@ -85,10 +93,11 @@ export default function App() {
           isVisible={hoverInfo.isVisible}
           x={hoverInfo.x}
           y={hoverInfo.y}
-          countryName={"France"}
-          population={67000000}
-          continent="Europe"
-          communicabilityIndex={0.65}
+        countryName={hoveredCountry?.name ?? (hoveredCountryID ?? 'Unknown Country')}
+        population={hoveredCountry?.population ?? 0}
+        continent={hoveredCountry?.region ?? 'Unknown Region'}
+        flag={hoveredCountry?.flag}
+        communicabilityIndex={hoveredReach}
           onClose={closeHoverPanel}
           onMouseEnter={() => setHoverInfo((prev: HoverState) => ({ ...prev, isLocked: true }))}
           onMouseLeave={closeHoverPanel}

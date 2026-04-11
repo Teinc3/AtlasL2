@@ -1,4 +1,5 @@
 import { useAtlasContext } from "../../../context";
+import { toCountryDisplayName, toLanguageDisplayName } from "../../../utils";
 
 import "./selectpanel.css"
 
@@ -9,6 +10,9 @@ export default function SelectPanel(props: BasePanelProps) {
   const { 
     selectedLanguages: languages, 
     selectedCountries: countries, 
+    countryMetadata,
+    languageMetadata,
+    metadataLoading,
     removeLanguage, 
     removeCountry,
     isSelectPanelOpen: isOpen,
@@ -34,13 +38,14 @@ export default function SelectPanel(props: BasePanelProps) {
         <div className="section">
           <h3>Active Languages</h3>
           <div className="inputWrapper">
-            <input type="text" placeholder="Search languages..." />
+            <input type="text" placeholder={metadataLoading ? "Loading languages..." : "Search languages..."} />
             {/* Dropdown would position here */}
           </div>
           <div className="chips">
             {languages.map(lang => (
               <span key={lang} className="chip">
-                {lang} <button onClick={() => removeLanguage(lang)}>×</button>
+                {toLanguageDisplayName(lang, languageMetadata)} 
+                <button onClick={() => removeLanguage(lang)}>×</button>
               </span>
             ))}
           </div>
@@ -49,13 +54,14 @@ export default function SelectPanel(props: BasePanelProps) {
         <div className="section">
           <h3>Selected Regions</h3>
           <div className="inputWrapper">
-            <input type="text" placeholder="Search regions..." />
+            <input type="text" placeholder={metadataLoading ? "Loading regions..." : "Search regions..."} />
             {/* Dropdown would position here */}
           </div>
           <div className="chips">
             {countries.map(country => (
               <span key={country} className="chip">
-                {country} <button onClick={() => removeCountry(country)}>×</button>
+                {toCountryDisplayName(country, countryMetadata)}
+                <button onClick={() => removeCountry(country)}>×</button>
               </span>
             ))}
           </div>

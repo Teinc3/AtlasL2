@@ -2,10 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CommunicativeMode } from '@atlasl2/shared';
 import { fetchGap, fetchReach } from '../api';
-import { resolveCountryIds, resolveLanguageIds } from './normalise';
 
 import type { 
-  CountryMetadataMap, LanguageMetadataMap,
   GapResponse, ReachResponse
 } from '@atlasl2/shared';
 
@@ -13,8 +11,6 @@ import type {
 export default function useIndices(
 	selectedLanguages: string[],
 	selectedCountries: string[],
-	languageMetadata: LanguageMetadataMap,
-	countryMetadata: CountryMetadataMap,
 	options?: Partial<{
 		mode: CommunicativeMode;
 		debounceMs: number;
@@ -30,15 +26,8 @@ export default function useIndices(
 	const [reachError, setReachError] = useState<string | null>(null);
 	const [gapError, setGapError] = useState<string | null>(null);
 	const requestIdRef = useRef(0);
-
-	const languageIds = useMemo(
-		() => resolveLanguageIds(selectedLanguages, languageMetadata),
-		[selectedLanguages, languageMetadata]
-	);
-	const countryIds = useMemo(
-		() => resolveCountryIds(selectedCountries, countryMetadata),
-		[selectedCountries, countryMetadata]
-	);
+	const languageIds = useMemo(() => selectedLanguages, [selectedLanguages]);
+	const countryIds = useMemo(() => selectedCountries, [selectedCountries]);
 	const requestKey = useMemo(
 		() => `${languageIds.join('|')}::${countryIds.join('|')}::${mode}`,
 		[languageIds, countryIds, mode]

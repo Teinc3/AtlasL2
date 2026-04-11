@@ -12,7 +12,7 @@ export const GDPMetadataSchema = Type.Object({
 });
 
 export const CountryOfficialScriptSchema = Type.Object({
-  iso3: ISO3CodeSchema,
+  iso3: Type.String({ pattern: '^[a-z]{3}$' }),
   primary_script: Type.Union([Type.String(), Type.Null()]),
 });
 

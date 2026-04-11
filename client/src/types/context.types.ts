@@ -2,10 +2,12 @@ import type { CountryMetadataMap, GapResponse, LanguageMetadataMap, ReachRespons
 
 
 export default interface AtlasContextType {
+  // ISO3 language IDs
   selectedLanguages: string[];
   addLanguage: (lang: string) => void;
   removeLanguage: (lang: string) => void;
   
+  // ISO3 country IDs
   selectedCountries: string[];
   setSelectedCountries: (countries: string[]) => void;
   addCountry: (country: string) => void;

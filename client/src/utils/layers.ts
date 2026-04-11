@@ -1,36 +1,40 @@
-import mockLinguisticProfiles from "../api";
-
 import type { Feature, Geometry } from 'geojson';
+import type { CountryMetadataMap, ReachResponse } from '@atlasl2/shared';
 import type CountryFeatureProperties from "../types/geojson.types";
 
 
 export function getCommunicabilityColor(
-  feature: Feature<Geometry, CountryFeatureProperties>
+  feature: Feature<Geometry, CountryFeatureProperties>,
+  reach: ReachResponse | null
 ): [number, number, number, number] {
-  const iso3 = feature.properties?.ADM0_A3;
-  const profile = iso3 ? mockLinguisticProfiles[iso3] : undefined;
+  const countryID = feature.properties?.ADM0_A3;
+  const communicabilityIndex = countryID ? reach?.breakdown[countryID] : undefined;
 
-  if (!profile) {
+  if (communicabilityIndex === undefined) {
     return [0, 0, 0, 0];
   }
 
-  // piecewise 1OH for better saturation
-  const red = Math.round(255 * Math.min(1, 2 * (1 - profile.communicabilityIndex)));
-  const green = Math.round(255 * Math.min(1, 2 * profile.communicabilityIndex));
+  // piecewise 10H for better saturation
+  const red = Math.round(255 * Math.min(1, 2 * (1 - communicabilityIndex)));
+  const green = Math.round(255 * Math.min(1, 2 * communicabilityIndex));
 
   return [red, green, 0, 160];
 }
 
-export function getElevation(feature: Feature<Geometry, CountryFeatureProperties>): number {
-  const iso3 = feature.properties?.ADM0_A3;
-  const profile = iso3 ? mockLinguisticProfiles[iso3] : undefined;
-  const population = profile?.totalPopulation ?? 0;
+export function getElevation(
+  feature: Feature<Geometry, CountryFeatureProperties>,
+  countryMetadata: CountryMetadataMap,
+  reach: ReachResponse | null
+): number {
+  const countryID = feature.properties?.ADM0_A3;
+  const population = countryID ? countryMetadata[countryID]?.population ?? 0 : 0;
+  const communicabilityIndex = countryID ? reach?.breakdown[countryID] : undefined;
 
-  if (population <= 0 || !profile) {
+  if (population <= 0 || communicabilityIndex === undefined) {
     return 0;
   }
 
-  const communicablePop = population * profile.communicabilityIndex;
+  const communicablePop = population * communicabilityIndex;
   
   // The Logarithmic Anchors
   const T1_CAP = 10_000_000;
