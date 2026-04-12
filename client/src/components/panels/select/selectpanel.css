@@ -9,6 +9,8 @@
   backdrop-filter: blur(4px);
   border-radius: 8px;
   outline: var(--panel-border);
+  position: relative;
+  z-index: 1;
   transition: border-radius 0.4s var(--morph-curve), 
               margin 0.4s var(--morph-curve);
   transform-origin: top left;
@@ -64,6 +66,7 @@
   max-height: 100vh;
   padding: 0 24px 24px 24px;
   opacity: 1;
+  overflow: visible;
 }
 
 .section {
@@ -101,18 +104,3 @@
   transform: translateY(-1px);
 }
 
-.inputWrapper input {
-  width: 100%;
-  padding: 10px;
-  background: var(--bg-dark);
-  color: white;
-  border: 1px solid #555;
-  border-radius: 6px;
-  box-sizing: border-box;
-  margin-bottom: 12px;
-}
-
-.inputWrapper input:focus {
-  outline: none;
-  border-color: var(--primary);
-}

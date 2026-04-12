@@ -80,6 +80,12 @@ export default function useIndices(
 	}, [languageIds, countryIds, mode]);
 
 	useEffect(() => {
+		if (languageIds.length > 0) {
+			// Mark loading immediately when a new request cycle begins (including debounce period)
+			setIsLoadingReach(true);
+			setIsLoadingGap(true);
+		}
+
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => {
 			void loadIndices(controller.signal);
@@ -89,7 +95,7 @@ export default function useIndices(
 			controller.abort();
 			clearTimeout(timeoutId);
 		};
-	}, [requestKey, debounceMs, loadIndices]);
+	}, [requestKey, debounceMs, loadIndices, languageIds.length]);
 
 	const refetchReach = useCallback(async () => {
 		const controller = new AbortController();

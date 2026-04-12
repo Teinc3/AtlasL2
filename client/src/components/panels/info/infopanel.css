@@ -1,3 +1,9 @@
+@property --score-pct {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
 .infoPanelContainer {
   display: flex;
   flex-direction: column;
@@ -147,6 +153,7 @@
   height: 150px;
   margin: 1rem auto 1rem;
   background: conic-gradient(#2ebf6f var(--score-pct, 0%), #a32f2f 0);
+  transition: --score-pct 220ms ease-out;
   border-radius: 50%;
   overflow: hidden;
   display: grid;

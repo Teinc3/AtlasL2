@@ -1,5 +1,11 @@
+import { useMemo, useState } from "react";
+
+import SearchDropdown from "../../search";
 import { useAtlasContext } from "../../../context";
-import { toCountryDisplayName, toLanguageDisplayName } from "../../../utils";
+import {
+  getCountryAutocompleteOptions, getLanguageAutocompleteOptions,
+  toCountryDisplayName, toLanguageDisplayName
+} from "../../../utils";
 
 import "./selectpanel.css"
 
@@ -13,11 +19,36 @@ export default function SelectPanel(props: BasePanelProps) {
     countryMetadata,
     languageMetadata,
     metadataLoading,
+    addLanguage,
+    addCountry,
     removeLanguage, 
     removeCountry,
     isSelectPanelOpen: isOpen,
     setIsSelectPanelOpen: setIsOpen
   } = useAtlasContext();
+
+  const [languageQuery, setLanguageQuery] = useState('');
+  const [countryQuery, setCountryQuery] = useState('');
+
+  const languageOptions = useMemo(
+    () => getLanguageAutocompleteOptions(languageMetadata, languages, languageQuery),
+    [languageMetadata, languages, languageQuery]
+  );
+
+  const countryOptions = useMemo(
+    () => getCountryAutocompleteOptions(countryMetadata, countries, countryQuery),
+    [countryMetadata, countries, countryQuery]
+  );
+
+  const handleLanguageSelect = (languageID: string) => {
+    addLanguage(languageID);
+    setLanguageQuery('');
+  };
+
+  const handleCountrySelect = (countryID: string) => {
+    addCountry(countryID);
+    setCountryQuery('');
+  };
 
   return (
     <div 
@@ -37,10 +68,13 @@ export default function SelectPanel(props: BasePanelProps) {
       <div className="selectPanelContent">
         <div className="section">
           <h3>Active Languages</h3>
-          <div className="inputWrapper">
-            <input type="text" placeholder={metadataLoading ? "Loading languages..." : "Search languages..."} />
-            {/* Dropdown would position here */}
-          </div>
+          <SearchDropdown
+            value={languageQuery}
+            placeholder={metadataLoading ? "Loading languages..." : "Search languages..."}
+            options={languageOptions}
+            onQueryChange={setLanguageQuery}
+            onSelect={handleLanguageSelect}
+          />
           <div className="chips">
             {languages.map(lang => (
               <span key={lang} className="chip">
@@ -53,10 +87,13 @@ export default function SelectPanel(props: BasePanelProps) {
 
         <div className="section">
           <h3>Selected Regions</h3>
-          <div className="inputWrapper">
-            <input type="text" placeholder={metadataLoading ? "Loading regions..." : "Search regions..."} />
-            {/* Dropdown would position here */}
-          </div>
+          <SearchDropdown
+            value={countryQuery}
+            placeholder={metadataLoading ? "Loading regions..." : "Search regions..."}
+            options={countryOptions}
+            onQueryChange={setCountryQuery}
+            onSelect={handleCountrySelect}
+          />
           <div className="chips">
             {countries.map(country => (
               <span key={country} className="chip">

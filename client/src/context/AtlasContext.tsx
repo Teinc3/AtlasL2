@@ -64,7 +64,11 @@ export function AtlasProvider({ children }: { children: ReactNode }) {
 	}, []);
 
 	const removeCountry = useCallback((country: string) => {
-		setSelectedCountries((prev) => prev.filter((selectedCountry) => selectedCountry !== country));
+		setSelectedCountries((prev) => {
+			const next = prev.filter((selectedCountry) => selectedCountry !== country);
+			setFocusedCountryId((focused) => (focused === country ? (next[0] ?? null) : focused));
+			return next;
+		});
 	}, []);
 
 	const handleSetSelectedCountries = useCallback((countries: string[]) => {
