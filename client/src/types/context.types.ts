@@ -1,4 +1,7 @@
-import type { CountryMetadataMap, GapResponse, LanguageMetadataMap, ReachResponse } from '@atlasl2/shared';
+import type {
+  CountryMetadataMap, LanguageMetadataMap,
+  ExploreResponse, GapResponse, ReachResponse
+} from '@atlasl2/shared';
 
 
 export default interface AtlasContextType {
@@ -31,8 +34,11 @@ export default interface AtlasContextType {
   // API indices
   reach: ReachResponse | null;
   gap: GapResponse | null;
+  explore: ExploreResponse | null;
   reachLoading: boolean;
   gapLoading: boolean;
+  exploreLoading: boolean;
   reachError: string | null;
   gapError: string | null;
+  exploreError: string | null;
 }

@@ -11,14 +11,11 @@ export default function InfoPanel(props: BasePanelProps) {
   const {
     isInfoPanelOpen: isOpen,
     setIsInfoPanelOpen: setIsOpen,
-    selectedCountries,
-    selectedLanguages,
+    selectedCountries, selectedLanguages,
     focusedCountryId,
-    countryMetadata,
-    languageMetadata,
-    reach,
-    metadataLoading,
-    reachLoading,
+    countryMetadata, languageMetadata,
+    reach, gap, explore,
+    metadataLoading, reachLoading, gapLoading, exploreLoading
   } = useAtlasContext();
 
   const primaryCountryID = focusedCountryId ?? selectedCountries[0] ?? null;
@@ -43,11 +40,54 @@ export default function InfoPanel(props: BasePanelProps) {
   const languageViewTitle = !hasCountries
     ? 'Global Linguistic Footprint'
     : hasSingleCountry
-      ? `Selected Region: ${primaryCountry?.name ?? toCountryDisplayName(selectedCountries[0], countryMetadata)}`
+      ? `Selected Country: ${primaryCountry?.name ?? toCountryDisplayName(selectedCountries[0], countryMetadata)}`
       : 'Selected Region';
   const circleScore = hasSingleCountry ? regionalScore : globalScore;
   const circleScorePct = circleScore !== undefined ? Math.round(circleScore * 100) : null;
   const scoreDonutStyle = { '--score-pct': `${circleScorePct ?? 0}%` } as CSSProperties;
+
+  const totalSelectedPopulation = selectedCountries.reduce((sum, countryId) => {
+    const population = countryMetadata[countryId]?.population ?? 0;
+    return sum + population;
+  }, 0);
+
+  const singleCountryExplore = primaryCountryID ? (explore?.[primaryCountryID] ?? []) : [];
+  const aggregatedExplore = Object.entries(
+    selectedCountries.reduce<Record<string, number>>((acc, countryId) => {
+      const countryPopulation = countryMetadata[countryId]?.population ?? 0;
+      if (!countryPopulation) {
+        return acc;
+      }
+
+      for (const entry of explore?.[countryId] ?? []) {
+        acc[entry.lang] = (acc[entry.lang] ?? 0) + entry.prevalence * countryPopulation;
+      }
+
+      return acc;
+    }, {})
+  )
+    .map(([lang, weightedPopulation]) => ({
+      lang,
+      prevalence: totalSelectedPopulation > 0 ? weightedPopulation / totalSelectedPopulation : 0,
+    }))
+    .sort((a, b) => b.prevalence - a.prevalence)
+    .slice(0, 5);
+  const countriesOnlyTopFive = hasSingleCountry
+    ? singleCountryExplore.slice(0, 5)
+    : aggregatedExplore;
+  const scopePopulation = hasSingleCountry
+    ? (primaryCountry?.population ?? totalSelectedPopulation)
+    : totalSelectedPopulation;
+
+  const formatGapRecommendation = (marginalGain: number) => {
+    const percentGain = Math.round(marginalGain * 100);
+    if (scopePopulation <= 0) {
+      return `+${percentGain}%`;
+    }
+
+    const estimatedPopulationIncrease = Math.round(scopePopulation * marginalGain);
+    return `+${percentGain}% (~${estimatedPopulationIncrease.toLocaleString()})`;
+  };
 
   return (
     <div 
@@ -74,23 +114,32 @@ export default function InfoPanel(props: BasePanelProps) {
         <div className={`stateWrapper ${showS1 ? 'active' : ''}`}>
           <div className="stateContent">
             <div className="infoState">
-              <h2>{primaryCountry?.name ?? 'No Country Selected'}</h2>
+              {hasSingleCountry ? (
+                <h2>{primaryCountry?.name ?? 'No Country Selected'}</h2>
+              ) : (
+                <h3 className="text-center">{`Region Overview: ${selectedCountries.length} Countries`}</h3>
+              )}
               <div className="statBlock">
-                <div className="label">Total Population</div>
+                <h4>Total Population</h4>
                 <div className="value">
                   {metadataLoading
                     ? 'Loading...'
-                    : primaryCountry
-                    ? primaryCountry.population.toLocaleString()
-                    : 'N/A'
+                    : hasSingleCountry
+                      ? (primaryCountry ? primaryCountry.population.toLocaleString() : 'N/A')
+                      : totalSelectedPopulation.toLocaleString()
                   }
                 </div>
               </div>
-                <h3>Active Language Selection</h3>
-              <ul>
-                {selectedLanguages.length === 0 && <li>No languages selected.</li>}
-                  {selectedLanguages.map((languageID) => (
-                    <li key={languageID}>{toLanguageDisplayName(languageID, languageMetadata)}</li>
+              <h4>Top Languages</h4>
+              <ul className="breakdownList">
+                {exploreLoading && <li>Loading...</li>}
+                {!exploreLoading && countriesOnlyTopFive.length === 0 && (
+                  <li>No language breakdown available.</li>
+                )}
+                {!exploreLoading && countriesOnlyTopFive.map((entry) => (
+                  <li key={entry.lang}>
+                    {toLanguageDisplayName(entry.lang, languageMetadata)}: {Math.round(entry.prevalence * 100)}%
+                  </li>
                 ))}
               </ul>
             </div>
@@ -115,8 +164,18 @@ export default function InfoPanel(props: BasePanelProps) {
               {hasSingleCountry ? (
                 <>
                   <ul className="breakdownList text-left mt-4">
-                    <li>Reachable: {regionalReachablePopulation.toLocaleString()}</li>
-                    <li>Unreachable: {regionalUnreachablePopulation.toLocaleString()}</li>
+                    <li>Reachable: ~{regionalReachablePopulation.toLocaleString()}</li>
+                    <li>Unreachable: ~{regionalUnreachablePopulation.toLocaleString()}</li>
+                  </ul>
+                  <h4 className="text-left mt-4">Useful Languages</h4>
+                  <ul className="breakdownList text-left">
+                    {gapLoading && <li>Loading...</li>}
+                    {!gapLoading && (gap?.length ?? 0) === 0 && <li>No recommendations yet.</li>}
+                    {!gapLoading && (gap ?? []).map((item) => (
+                      <li key={item.lang}>
+                        {toLanguageDisplayName(item.lang, languageMetadata)}: {formatGapRecommendation(item.marginalGain)}
+                      </li>
+                    ))}
                   </ul>
                 </>
               ) : (
@@ -133,6 +192,20 @@ export default function InfoPanel(props: BasePanelProps) {
                       </div>
                     ))}
                   </div>
+                  {hasCountries && (
+                    <>
+                      <h4 className="text-left mt-4">Useful Languages</h4>
+                      <ul className="breakdownList text-left">
+                        {gapLoading && <li>Loading...</li>}
+                        {!gapLoading && (gap?.length ?? 0) === 0 && <li>No recommendations yet.</li>}
+                        {!gapLoading && (gap ?? []).map((item) => (
+                          <li key={item.lang}>
+                            {toLanguageDisplayName(item.lang, languageMetadata)}: {formatGapRecommendation(item.marginalGain)}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
                 </>
               )}
             </div>

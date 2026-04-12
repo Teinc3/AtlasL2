@@ -27,10 +27,11 @@ export function AtlasProvider({ children }: { children: ReactNode }) {
 	const [isInfoPanelOpen, setIsInfoPanelOpen] = useState<boolean>(false);
 
 	const {
-		reach, gap,
+		reach, gap, explore,
 		isLoadingReach: reachLoading,
 		isLoadingGap: gapLoading,
-		reachError, gapError,
+		isLoadingExplore: exploreLoading,
+		reachError, gapError, exploreError,
 	} = useIndices(selectedLanguages, selectedCountries);
 
 	const addLanguage = useCallback((lang: string) => {
@@ -84,29 +85,18 @@ export function AtlasProvider({ children }: { children: ReactNode }) {
 	return (
 		<AtlasContext.Provider
 			value={{
-				selectedLanguages,
-				addLanguage,
-				removeLanguage,
-				selectedCountries,
+				selectedLanguages, selectedCountries,
 				setSelectedCountries: handleSetSelectedCountries,
-				addCountry,
-				removeCountry,
+				addLanguage, removeLanguage,
+				addCountry, removeCountry,
 				focusedCountryId,
 				setFocusedCountryId,
-				countryMetadata,
-				languageMetadata,
-				metadataLoading,
-				metadataError,
-				reach,
-				gap,
-				reachLoading,
-				gapLoading,
-				reachError,
-				gapError,
-				isSelectPanelOpen,
-				setIsSelectPanelOpen,
-				isInfoPanelOpen,
-				setIsInfoPanelOpen,
+				countryMetadata, languageMetadata,
+				reach, gap, explore,
+				metadataLoading, reachLoading, gapLoading, exploreLoading,
+        metadataError, reachError, gapError, exploreError,
+				isSelectPanelOpen, isInfoPanelOpen,
+				setIsSelectPanelOpen, setIsInfoPanelOpen,
 			}}
 		>
 			{children}

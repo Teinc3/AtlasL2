@@ -41,23 +41,24 @@
   max-height: 100vh;
   padding: 0 24px 24px 24px;
   opacity: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 /* State Transitions */
 .stateWrapper {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.4s var(--morph-curve);
+  display: none;
 }
 
 .stateWrapper.active {
-  grid-template-rows: 1fr;
+  display: flex;
 }
 
 .stateContent {
-  overflow: hidden;
-  opacity: 0;
-  transition: opacity 0.3s var(--morph-curve);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* pushes content to top */
+  width: 100%;
 }
 
 .stateWrapper.active .stateContent {
@@ -79,18 +80,18 @@
 }
 
 .infoState h2 {
-  margin: 0 0 16px 0;
+  margin: 0;
   color: var(--primary);
 }
 
 .infoState h3 {
-  margin: 0 0 12px 0;
+  margin: 0 0 1rem 0;
   color: var(--dimmed-white);
   font-size: 1rem;
 }
 
 .infoState h4 {
-  margin: 0 0 12px 0;
+  margin: 1.25rem 0 1rem;
   color: #aaa;
   font-size: 0.9rem;
 }
@@ -101,6 +102,10 @@
 
 .infoState li {
   margin-bottom: 8px;
+}
+
+.infoState p {
+  margin: 0;
 }
 
 /* State 0: Helper */
@@ -145,13 +150,13 @@
   color: #aaa;
   font-size: 0.85rem;
   text-transform: uppercase;
-  margin: 1rem 0 2rem;
+  margin: 1.5rem 0;
 }
 
 .scoreDonut {
   width: 150px;
   height: 150px;
-  margin: 1rem auto 1rem;
+  margin: 1.5rem auto;
   background: conic-gradient(#2ebf6f var(--score-pct, 0%), #a32f2f 0);
   transition: --score-pct 220ms ease-out;
   border-radius: 50%;
@@ -180,6 +185,8 @@
   list-style-type: none;
   padding: 0;
   margin: 0;
+  list-style-type: disc;
+  list-style-position: inside;
 }
 
 .barChartPlaceholder {
@@ -195,7 +202,8 @@
 }
 
 .barLabel {
-  width: 40px;
+  width: 5rem;
+  text-align: left;
   font-size: 0.85rem;
   color: var(--dimmed-white);
 }
@@ -203,7 +211,7 @@
 .barTrack {
   flex-grow: 1;
   height: 16px;
-  background: #2a2a2a;
+  background: #545454;
   border-radius: 8px;
 }
 
