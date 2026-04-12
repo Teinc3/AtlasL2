@@ -17,7 +17,7 @@ export default function useIndices(
 	}>
 ) {
 	const mode = options?.mode ?? CommunicativeMode.Active;
-	const debounceMs = options?.debounceMs ?? 400;
+	const debounceMs = options?.debounceMs ?? 600;
 
 	const [reach, setReach] = useState<ReachResponse | null>(null);
 	const [gap, setGap] = useState<GapResponse | null>(null);
@@ -26,12 +26,29 @@ export default function useIndices(
 	const [reachError, setReachError] = useState<string | null>(null);
 	const [gapError, setGapError] = useState<string | null>(null);
 	const requestIdRef = useRef(0);
+	const changeTimesRef = useRef<number[]>([]);
 	const languageIds = useMemo(() => selectedLanguages, [selectedLanguages]);
 	const countryIds = useMemo(() => selectedCountries, [selectedCountries]);
 	const requestKey = useMemo(
 		() => `${languageIds.join('|')}::${countryIds.join('|')}::${mode}`,
 		[languageIds, countryIds, mode]
 	);
+
+	const getAdaptiveDebounceMs = useCallback(() => {
+		const now = Date.now();
+		const windowMs = 5000;
+		const recentChanges = changeTimesRef.current.filter(timestamp => now - timestamp < windowMs);
+		recentChanges.push(now);
+		changeTimesRef.current = recentChanges;
+
+		if (recentChanges.length <= 3) {
+			return 0;
+		} else if (recentChanges.length <= 6) {
+      return debounceMs / 2;
+    } else {
+      return debounceMs;
+    }
+	}, [debounceMs]);
 
 	const loadIndices = useCallback(async (signal: AbortSignal) => {
 		if (languageIds.length === 0) {
@@ -89,13 +106,13 @@ export default function useIndices(
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => {
 			void loadIndices(controller.signal);
-		}, debounceMs);
+		}, getAdaptiveDebounceMs());
 
 		return () => {
 			controller.abort();
 			clearTimeout(timeoutId);
 		};
-	}, [requestKey, debounceMs, loadIndices, languageIds.length]);
+	}, [requestKey, loadIndices, languageIds.length, getAdaptiveDebounceMs]);
 
 	const refetchReach = useCallback(async () => {
 		const controller = new AbortController();

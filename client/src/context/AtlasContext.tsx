@@ -19,7 +19,7 @@ export function AtlasProvider({ children }: { children: ReactNode }) {
 		error: metadataError,
 	} = useMetadata();
 
-	const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['ENG']);
+	const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
 	const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
 	const [focusedCountryId, setFocusedCountryId] = useState<string | null>(null);
 
