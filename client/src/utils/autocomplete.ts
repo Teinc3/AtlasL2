@@ -2,6 +2,11 @@ import type { CountryMetadataMap, LanguageMetadataMap } from '@atlasl2/shared';
 import type { AutocompleteOption } from '../types';
 
 
+const translator = new Intl.DisplayNames(['en'], {
+  type: 'language',
+  fallback: 'none'
+});
+
 /** Filters and sorts autocomplete options based on search query */
 function filterAndSortOptions(
   options: AutocompleteOption[],
@@ -85,5 +90,10 @@ export function toCountryDisplayName(countryID: string, countryMetadata: Country
 }
 
 export function toLanguageDisplayName(languageID: string, languageMetadata: LanguageMetadataMap): string {
-	return languageMetadata[languageID]?.displayName ?? 'Language ' + languageID;
+	if (languageMetadata[languageID]?.displayName) {
+		return languageMetadata[languageID].displayName;
+	}
+
+  const translated = translator.of(languageID);
+	return translated || 'Language ' + languageID;
 }
