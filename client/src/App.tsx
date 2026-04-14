@@ -57,7 +57,7 @@ export default function App() {
 
   const hoveredCountryID = hoverInfo.countryId;
   const hoveredCountry = hoveredCountryID ? countryMetadata[hoveredCountryID] : undefined;
-  const hoveredReach = hoveredCountryID ? reach?.breakdown[hoveredCountryID] : undefined;
+  const hoveredReach = hoveredCountryID ? reach?.breakdown[hoveredCountryID]?.score : undefined;
 
   return (
     <div className="appContainer">

@@ -4,6 +4,24 @@ import { formatGapRecommendation, formatPPPBillions, formatPPPPerCapita } from "
 import type { CountriesOnlyStateViewProps, LanguageViewStateProps } from "../../../types";
 
 
+function renderGapRecommendations(
+  gapLoading: boolean,
+  gap: LanguageViewStateProps["gap"],
+  languageMetadata: LanguageViewStateProps["languageMetadata"],
+) {
+  return (
+    <ul className="breakdownList text-left">
+      {gapLoading && <li>Loading...</li>}
+      {!gapLoading && (gap?.length ?? 0) === 0 && <li>No recommendations yet.</li>}
+      {!gapLoading && (gap ?? []).map((item) => (
+        <li key={item.lang}>
+          {toLanguageDisplayName(item.lang, languageMetadata)}: {formatGapRecommendation(item.marginalGain, item.estimatedPopulationGain)}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function CountriesOnlyStateView(props: CountriesOnlyStateViewProps) {
   return (
     <div className="infoState">
@@ -70,7 +88,7 @@ export function CountriesOnlyStateView(props: CountriesOnlyStateViewProps) {
         <div className="statBlock">
           <h4>Total Population</h4>
           <div className="value">
-            {props.metadataLoading ? "Loading..." : props.totalSelectedPopulation.toLocaleString()}
+            {props.metadataLoading || props.exploreLoading ? "Loading..." : props.selectedPopulation.toLocaleString()}
           </div>
         </div>
       )}
@@ -78,10 +96,10 @@ export function CountriesOnlyStateView(props: CountriesOnlyStateViewProps) {
       <h4>Top Languages</h4>
       <ul className="breakdownList">
         {props.exploreLoading && <li>Loading...</li>}
-        {!props.exploreLoading && props.countriesOnlyTopFive.length === 0 && (
+        {!props.exploreLoading && props.topLanguages.length === 0 && (
           <li>No language breakdown available.</li>
         )}
-        {!props.exploreLoading && props.countriesOnlyTopFive.map((entry) => (
+        {!props.exploreLoading && props.topLanguages.map((entry) => (
           <li key={entry.lang}>
             {toLanguageDisplayName(entry.lang, props.languageMetadata)}: {Math.round(entry.prevalence * 100)}%
           </li>
@@ -109,43 +127,30 @@ export function LanguageViewState(props: LanguageViewStateProps) {
             <li>Reachable: ~{props.regionalReachablePopulation.toLocaleString()}</li>
             <li>Unreachable: ~{props.regionalUnreachablePopulation.toLocaleString()}</li>
           </ul>
-          <h4 className="text-left mt-4">Useful Languages</h4>
-          <ul className="breakdownList text-left">
-            {props.gapLoading && <li>Loading...</li>}
-            {!props.gapLoading && (props.gap?.length ?? 0) === 0 && <li>No recommendations yet.</li>}
-            {!props.gapLoading && (props.gap ?? []).map((item) => (
-              <li key={item.lang}>
-                {toLanguageDisplayName(item.lang, props.languageMetadata)}: {formatGapRecommendation(item.marginalGain, props.scopePopulation)}
-              </li>
-            ))}
-          </ul>
+          <h4 className="text-left mt-4">Incremental Reach</h4>
+          {renderGapRecommendations(props.gapLoading, props.gap, props.languageMetadata)}
         </>
       ) : (
         <>
           <h4 className="text-left mt-4">Top Contributing Regions</h4>
           <div className="barChartPlaceholder">
             {props.topContributors.length === 0 && <div className="barRow">No data yet.</div>}
-            {props.topContributors.map(([countryID, score]) => (
-              <div className="barRow" key={countryID}>
-                <span className="barLabel">{toCountryDisplayName(countryID, props.countryMetadata)}</span>
+            {props.topContributors.map((entry) => (
+              <div className="barRow" key={entry.countryID}>
+                <span className="barLabel">{toCountryDisplayName(entry.countryID, props.countryMetadata)}</span>
                 <div className="barTrack">
-                  <div className="barFill" style={{ width: `${Math.round(score * 100)}%` }}></div>
+                  <div
+                    className="barFill"
+                    style={{ width: `${Math.min(100, entry.score * 95 + 5)}%` }}
+                  ></div>
                 </div>
               </div>
             ))}
           </div>
           {props.hasCountries && (
             <>
-              <h4 className="text-left mt-4">Useful Languages</h4>
-              <ul className="breakdownList text-left">
-                {props.gapLoading && <li>Loading...</li>}
-                {!props.gapLoading && (props.gap?.length ?? 0) === 0 && <li>No recommendations yet.</li>}
-                {!props.gapLoading && (props.gap ?? []).map((item) => (
-                  <li key={item.lang}>
-                    {toLanguageDisplayName(item.lang, props.languageMetadata)}: {formatGapRecommendation(item.marginalGain, props.scopePopulation)}
-                  </li>
-                ))}
-              </ul>
+              <h4 className="text-left mt-4">Incremental Reach</h4>
+              {renderGapRecommendations(props.gapLoading, props.gap, props.languageMetadata)}
             </>
           )}
         </>

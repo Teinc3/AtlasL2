@@ -1,66 +1,16 @@
 import { toCountryDisplayName, toLanguageDisplayName } from "./autocomplete";
 
 import type {
-  CountryMetadata, CountryMetadataMap, LanguageMetadataMap,
-  ExploreResponse, ReachResponse,
+  CountryMetadata, CountryMetadataMap, LanguageMetadataMap
 } from "@atlasl2/shared";
-import type { TopLanguageEntry } from "../types";
 
-
-export function computeTotalSelectedPopulation(
-  selectedCountries: string[],
-  countryMetadata: CountryMetadataMap
-): number {
-  return selectedCountries.reduce((sum, countryId) => {
-    const population = countryMetadata[countryId]?.population ?? 0;
-    return sum + population;
-  }, 0);
-}
-
-export function computeCountriesOnlyTopFive(
-  selectedCountries: string[],
-  countryMetadata: CountryMetadataMap,
-  explore: ExploreResponse | null,
-  primaryCountryID: string | null,
-  hasSingleCountry: boolean,
-  totalSelectedPopulation: number
-): TopLanguageEntry[] {
-  const singleCountryExplore = primaryCountryID ? (explore?.[primaryCountryID] ?? []) : [];
-
-  if (hasSingleCountry) {
-    return singleCountryExplore.slice(0, 5);
-  }
-
-  return Object.entries(
-    selectedCountries.reduce<Record<string, number>>((acc, countryId) => {
-      const countryPopulation = countryMetadata[countryId]?.population ?? 0;
-      if (!countryPopulation) {
-        return acc;
-      }
-
-      for (const entry of explore?.[countryId] ?? []) {
-        acc[entry.lang] = (acc[entry.lang] ?? 0) + entry.prevalence * countryPopulation;
-      }
-
-      return acc;
-    }, {})
-  )
-    .map(([lang, weightedPopulation]) => ({
-      lang,
-      prevalence: totalSelectedPopulation > 0 ? weightedPopulation / totalSelectedPopulation : 0,
-    }))
-    .sort((a, b) => b.prevalence - a.prevalence)
-    .slice(0, 5);
-}
-
-export function formatGapRecommendation(marginalGain: number, scopePopulation: number): string {
+export function formatGapRecommendation(marginalGain: number, estimatedPopulationGain: number): string {
   const percentGain = Math.round(marginalGain * 100);
-  if (scopePopulation <= 0) {
+  if (estimatedPopulationGain <= 0) {
     return `+${percentGain}%`;
   }
 
-  const estimatedPopulationIncrease = Math.round(scopePopulation * marginalGain);
-  return `+${percentGain}% (~${estimatedPopulationIncrease.toLocaleString()})`;
+  return `+${percentGain}% (~${estimatedPopulationGain.toLocaleString()})`;
 }
 
 export function formatPPPBillions(value: number | null): string {
@@ -137,34 +87,4 @@ export function computeLanguageViewTitle(
   }
 
   return "Selected Region";
-}
-
-export function computeCircleScore(
-  hasSingleCountry: boolean,
-  primaryCountryID: string | null,
-  reach: ReachResponse | null
-): number | undefined {
-  return hasSingleCountry ? reach?.breakdown[primaryCountryID ?? ""] : reach?.globalIndex;
-}
-
-export function computeTopContributors(reach: ReachResponse | null): [string, number][] {
-  return Object.entries(reach?.breakdown ?? {})
-    .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
-    .slice(0, 3);
-}
-
-export function computeRegionalReachability(
-  primaryCountry: CountryMetadata | null,
-  primaryCountryID: string | null,
-  reach: ReachResponse | null
-): { reachable: number; unreachable: number } {
-  const regionalScore = primaryCountryID ? reach?.breakdown[primaryCountryID] : undefined;
-  const reachable = primaryCountry && regionalScore !== undefined
-    ? Math.round(primaryCountry.population * regionalScore)
-    : 0;
-  const unreachable = primaryCountry && regionalScore !== undefined
-    ? Math.max(0, primaryCountry.population - reachable)
-    : 0;
-
-  return { reachable, unreachable };
 }

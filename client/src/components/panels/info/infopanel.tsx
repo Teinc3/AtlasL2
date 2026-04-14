@@ -1,8 +1,7 @@
 import { useAtlasContext } from "../../../context";
 import {
   buildSingleCountryOfficialLanguages, buildSingleCountryPrimaryScripts,
-  computeCircleScore, computeCountriesOnlyTopFive, computeLanguageViewTitle,
-  computeRegionalReachability, computeTopContributors, computeTotalSelectedPopulation
+  computeLanguageViewTitle
 } from "../../../utils";
 import { CountriesOnlyStateView, LanguageViewState } from "./infoviews";
 
@@ -25,7 +24,6 @@ export default function InfoPanel(props: BasePanelProps) {
 
   const primaryCountryID = focusedCountryId ?? selectedCountries[0] ?? null;
   const primaryCountry = primaryCountryID ? countryMetadata[primaryCountryID] : null;
-  const topContributors = computeTopContributors(reach);
   const hasLanguages = selectedLanguages.length > 0;
   const hasCountries = selectedCountries.length > 0;
   const hasSingleCountry = selectedCountries.length === 1;
@@ -39,27 +37,10 @@ export default function InfoPanel(props: BasePanelProps) {
     selectedCountries,
     countryMetadata
   );
-  const circleScore = computeCircleScore(hasSingleCountry, primaryCountryID, reach);
+  const primaryCountryReach = primaryCountryID ? reach?.breakdown[primaryCountryID] : undefined;
+  const circleScore = hasSingleCountry ? primaryCountryReach?.score : reach?.globalIndex;
   const circleScorePct = circleScore !== undefined ? Math.round(circleScore * 100) : null;
   const scoreDonutStyle = { '--score-pct': `${circleScorePct ?? 0}%` } as CSSProperties;
-
-  const totalSelectedPopulation = computeTotalSelectedPopulation(selectedCountries, countryMetadata);
-  const countriesOnlyTopFive = computeCountriesOnlyTopFive(
-    selectedCountries,
-    countryMetadata,
-    explore,
-    primaryCountryID,
-    hasSingleCountry,
-    totalSelectedPopulation
-  );
-  const scopePopulation = hasSingleCountry
-    ? (primaryCountry?.population ?? totalSelectedPopulation)
-    : totalSelectedPopulation;
-  const { reachable: regionalReachablePopulation, unreachable: regionalUnreachablePopulation } = computeRegionalReachability(
-    primaryCountry,
-    primaryCountryID,
-    reach
-  );
 
   const scriptDisplayNames = new Intl.DisplayNames(['en'], { type: 'script' })
   const englishLanguageDisplayNames = new Intl.DisplayNames(['en'], { type: 'language' })
@@ -99,10 +80,10 @@ export default function InfoPanel(props: BasePanelProps) {
               primaryCountry={primaryCountry}
               selectedCountriesCount={selectedCountries.length}
               metadataLoading={metadataLoading}
-              totalSelectedPopulation={totalSelectedPopulation}
+              selectedPopulation={explore?.selectedPopulation ?? 0}
               singleCountryOfficialLanguages={singleCountryOfficialLanguages}
               singleCountryPrimaryScripts={singleCountryPrimaryScripts}
-              countriesOnlyTopFive={countriesOnlyTopFive}
+              topLanguages={explore?.topLanguages ?? []}
               exploreLoading={exploreLoading}
               languageMetadata={languageMetadata}
             />
@@ -117,13 +98,12 @@ export default function InfoPanel(props: BasePanelProps) {
               reachLoading={reachLoading}
               circleScorePct={circleScorePct}
               hasSingleCountry={hasSingleCountry}
-              regionalReachablePopulation={regionalReachablePopulation}
-              regionalUnreachablePopulation={regionalUnreachablePopulation}
+              regionalReachablePopulation={primaryCountryReach?.reachable ?? 0}
+              regionalUnreachablePopulation={primaryCountryReach?.unreachable ?? 0}
               gapLoading={gapLoading}
               gap={gap}
               languageMetadata={languageMetadata}
-              scopePopulation={scopePopulation}
-              topContributors={topContributors}
+              topContributors={reach?.topContributingRegions ?? []}
               countryMetadata={countryMetadata}
               hasCountries={hasCountries}
             />

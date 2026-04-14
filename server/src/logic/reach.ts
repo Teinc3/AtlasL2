@@ -1,6 +1,9 @@
 import { buildCountryReach } from './probability';
+import { toSignificantFigures } from '../utils';
 
-import type { ReachRequest, ReachResponse } from '@atlasl2/shared';
+import type { 
+  ReachCountryMetrics, ReachRequest, ReachResponse, TopContributingRegion
+} from '@atlasl2/shared';
 import type { AppData } from '../types';
 
 
@@ -17,7 +20,8 @@ export function computeReach(
     ? targets
     : Object.keys(dataStore.countryMetadata);
 
-  const breakdown: Record<string, number> = {};
+  const breakdown: Record<string, ReachCountryMetrics> = {};
+  const topContributingRegions: TopContributingRegion[] = [];
   let weightedTotal = 0;
   let totalPopulation = 0;
 
@@ -28,14 +32,33 @@ export function computeReach(
     }
 
     const reach = buildCountryReach(dataStore, target, languages);
-    breakdown[target] = reach;
+    const reachable = toSignificantFigures(country.population * reach);
+    const unreachable = toSignificantFigures(Math.max(0, country.population - (country.population * reach)));
+
+    breakdown[target] = {
+      score: reach,
+      reachable,
+      unreachable,
+    };
+
+    const estimatedSpeakers = country.population * reach;
+    if (estimatedSpeakers > 0) {
+      topContributingRegions.push({
+        countryID: target,
+        score: reach,
+        estimatedSpeakers: toSignificantFigures(estimatedSpeakers),
+      });
+    }
 
     weightedTotal += reach * country.population;
     totalPopulation += country.population;
   }
 
+  topContributingRegions.sort((left, right) => right.estimatedSpeakers - left.estimatedSpeakers);
+
   return {
     globalIndex: totalPopulation > 0 ? weightedTotal / totalPopulation : 0,
     breakdown,
+    topContributingRegions: topContributingRegions.slice(0, 5),
   };
 }

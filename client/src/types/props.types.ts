@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import type { 
-  CountryMetadata, CountryMetadataMap, GapResponse, LanguageMetadataMap
+  CountryMetadata, CountryMetadataMap, LanguageMetadataMap, 
+  GapResponse, RegionalDistribution, TopContributingRegion
 } from "@atlasl2/shared";
 
 
@@ -38,13 +39,10 @@ export type CountriesOnlyStateViewProps = {
   primaryCountry: CountryMetadata | null;
   selectedCountriesCount: number;
   metadataLoading: boolean;
-  totalSelectedPopulation: number;
+  selectedPopulation: number;
   singleCountryOfficialLanguages: string[];
   singleCountryPrimaryScripts: string[];
-  countriesOnlyTopFive: {
-    lang: string;
-    prevalence: number;
-  }[];
+  topLanguages: RegionalDistribution[];
   exploreLoading: boolean;
   languageMetadata: LanguageMetadataMap;
 };
@@ -60,8 +58,7 @@ export type LanguageViewStateProps = {
   gapLoading: boolean;
   gap: GapResponse | null;
   languageMetadata: LanguageMetadataMap;
-  scopePopulation: number;
-  topContributors: [string, number][];
+  topContributors: TopContributingRegion[];
   countryMetadata: CountryMetadataMap;
   hasCountries: boolean;
 };

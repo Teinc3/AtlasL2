@@ -40,7 +40,7 @@ export function getCommunicabilityColor(
   selectedCountries: string[] = []
 ): [number, number, number, number] {
   const countryID = feature.properties?.ADM0_A3;
-  const communicabilityIndex = countryID ? reach?.breakdown[countryID] : undefined;
+  const communicabilityIndex = countryID ? reach?.breakdown[countryID]?.score : undefined;
 
   if (communicabilityIndex === undefined) {
     return countryID && reach === null && selectedCountries.includes(countryID)
@@ -63,7 +63,7 @@ export function getElevation(
 ): number {
   const countryID = feature.properties?.ADM0_A3;
   const population = countryID ? countryMetadata[countryID]?.population ?? 0 : 0;
-  const communicabilityIndex = countryID ? reach?.breakdown[countryID] : undefined;
+  const communicabilityIndex = countryID ? reach?.breakdown[countryID]?.score : undefined;
 
   if (communicabilityIndex === undefined) {
     return countryID && reach === null && selectedCountries.includes(countryID)
