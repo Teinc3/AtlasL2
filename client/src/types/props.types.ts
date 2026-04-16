@@ -11,6 +11,7 @@ export interface HoverPanelProps {
   countryName: string;
   population: number;
   continent: string;
+  communicablePopulation?: number;
   flag?: string;
   isVisible: boolean;
   /* This is optional bcz there may not be any selected langs */

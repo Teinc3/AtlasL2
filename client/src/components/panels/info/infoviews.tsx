@@ -1,5 +1,7 @@
 import { toCountryDisplayName, toLanguageDisplayName } from "../../../utils";
-import { formatGapRecommendation, formatPPPBillions, formatPPPPerCapita } from "../../../utils";
+import { 
+  formatCompactPopulation, formatGapRecommendation, formatPPPBillions, formatPPPPerCapita
+} from "../../../utils";
 
 import type { CountriesOnlyStateViewProps, LanguageViewStateProps } from "../../../types";
 
@@ -141,9 +143,10 @@ export function LanguageViewState(props: LanguageViewStateProps) {
                 <div className="barTrack">
                   <div
                     className="barFill"
-                    style={{ width: `${Math.min(100, entry.score * 95 + 5)}%` }}
+                    style={{ width: `${Math.min(100, entry.score * 92 + 8)}%` }}
                   ></div>
                 </div>
+                <span className="barValue">{formatCompactPopulation(entry.estimatedSpeakers)}</span>
               </div>
             ))}
           </div>

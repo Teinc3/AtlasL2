@@ -26,15 +26,18 @@ export function buildGapResponse(dataStore: AppData, body: GapRequest): GapRespo
         body.targets
       ).globalIndex;
 
+      const marginalGain = Math.max(0, potentialReach - baseReach);
+
       return {
         lang: language.id,
         potentialReach,
-        marginalGain: potentialReach - baseReach,
+        marginalGain,
         estimatedPopulationGain: toSignificantFigures(
-          scopePopulation * (potentialReach - baseReach)
+          scopePopulation * marginalGain
         ),
       };
     })
+    .filter(recommendation => recommendation.marginalGain > 0)
     .sort((left, right) => {
       if (right.marginalGain !== left.marginalGain) {
         return right.marginalGain - left.marginalGain;

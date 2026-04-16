@@ -209,7 +209,7 @@
 }
 
 .barLabel {
-  width: 5rem;
+  width: 4.5rem;
   text-align: left;
   font-size: 0.85rem;
   color: var(--dimmed-white);
@@ -217,6 +217,7 @@
 
 .barTrack {
   flex-grow: 1;
+  min-width: 0;
   height: 16px;
   background: #545454;
   border-radius: 8px;
@@ -226,4 +227,12 @@
   height: 100%;
   background: var(--primary);
   border-radius: 8px;
+}
+
+.barValue {
+  width: 2.3rem;
+  flex-shrink: 0;
+  text-align: right;
+  font-size: 0.78rem;
+  color: #bbb;
 }

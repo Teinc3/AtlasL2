@@ -10,7 +10,7 @@ export default function HoverPanel(props: HoverPanelProps) {
 
   const {
     x, y,
-    countryName, population, continent, flag, isVisible, communicabilityIndex,
+    countryName, population, communicablePopulation, continent, flag, isVisible, communicabilityIndex,
     onClose, onMouseEnter, onMouseLeave
   } = props;
 
@@ -49,17 +49,23 @@ export default function HoverPanel(props: HoverPanelProps) {
         
         <div className="hoverDetails">
           <div className="hoverRow">
-            <span className="hoverLabel">Population:</span>
-            <span className="hoverValue">{population.toLocaleString()}</span>
-          </div>
-          <div className="hoverRow">
             <span className="hoverLabel">Region:</span>
             <span className="hoverValue">{continent}</span>
           </div>
+          <div className="hoverRow">
+            <span className="hoverLabel">Population:</span>
+            <span className="hoverValue">{population.toLocaleString()}</span>
+          </div>
+          {communicablePopulation !== undefined && (
+            <div className="hoverRow">
+              <span className="hoverLabel">Reachable:</span>
+              <span className="hoverValue">{communicablePopulation.toLocaleString()}</span>
+            </div>
+          )}
           {communicabilityIndex !== undefined && (
             <div className="hoverRow">
               <span className="hoverLabel">Communicability:</span>
-              <span className="hoverValue">{(communicabilityIndex * 100).toFixed(1)}%</span>
+              <span className="hoverValue">{(communicabilityIndex * 100).toFixed(1)}</span>
             </div>
           )}
         </div>

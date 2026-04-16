@@ -58,6 +58,9 @@ export default function App() {
   const hoveredCountryID = hoverInfo.countryId;
   const hoveredCountry = hoveredCountryID ? countryMetadata[hoveredCountryID] : undefined;
   const hoveredReach = hoveredCountryID ? reach?.breakdown[hoveredCountryID]?.score : undefined;
+  const hoveredCommunicablePopulation = hoveredCountryID
+    ? reach?.breakdown[hoveredCountryID]?.reachable
+    : undefined;
 
   return (
     <div className="appContainer">
@@ -93,11 +96,12 @@ export default function App() {
           isVisible={hoverInfo.isVisible}
           x={hoverInfo.x}
           y={hoverInfo.y}
-        countryName={hoveredCountry?.name ?? (hoveredCountryID ?? 'Unknown Country')}
-        population={hoveredCountry?.population ?? 0}
-        continent={hoveredCountry?.region ?? 'Unknown Region'}
-        flag={hoveredCountry?.flag}
-        communicabilityIndex={hoveredReach}
+          countryName={hoveredCountry?.name ?? (hoveredCountryID ?? 'Unknown Country')}
+          population={hoveredCountry?.population ?? 0}
+          communicablePopulation={hoveredCommunicablePopulation}
+          continent={hoveredCountry?.region ?? 'Unknown Region'}
+          flag={hoveredCountry?.flag}
+          communicabilityIndex={hoveredReach}
           onClose={closeHoverPanel}
           onMouseEnter={() => setHoverInfo((prev: HoverState) => ({ ...prev, isLocked: true }))}
           onMouseLeave={closeHoverPanel}

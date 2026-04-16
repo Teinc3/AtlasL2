@@ -4,6 +4,20 @@ import type {
   CountryMetadata, CountryMetadataMap, LanguageMetadataMap
 } from "@atlasl2/shared";
 
+
+const compactPopulationFormatter = new Intl.NumberFormat("en", {
+  notation: "compact",
+  maximumFractionDigits: 1,
+});
+
+export function formatCompactPopulation(value: number): string {
+  if (!Number.isFinite(value) || value <= 0) {
+    return "0";
+  }
+
+  return compactPopulationFormatter.format(value).replace(/\s+/g, "");
+}
+
 export function formatGapRecommendation(marginalGain: number, estimatedPopulationGain: number): string {
   const percentGain = Math.round(marginalGain * 100);
   if (estimatedPopulationGain <= 0) {
