@@ -6,10 +6,32 @@ import {
 import type { CountriesOnlyStateViewProps, LanguageViewStateProps } from "../../../types";
 
 
+function renderSelectableLabel(
+  label: string,
+  code: string | undefined,
+  onSelect?: (id: string) => void,
+) {
+  if (!onSelect || !code) {
+    return <>{label}</>;
+  }
+
+  return (
+    <button
+      type="button"
+      className="inlineActionLabel"
+      onClick={() => onSelect(code)}
+    >
+      {label}
+    </button>
+  );
+}
+
+
 function renderGapRecommendations(
   gapLoading: boolean,
   gap: LanguageViewStateProps["gap"],
   languageMetadata: LanguageViewStateProps["languageMetadata"],
+  onAddLanguage?: LanguageViewStateProps["onAddLanguage"],
 ) {
   return (
     <ul className="breakdownList text-left">
@@ -17,7 +39,7 @@ function renderGapRecommendations(
       {!gapLoading && (gap?.length ?? 0) === 0 && <li>No recommendations yet.</li>}
       {!gapLoading && (gap ?? []).map((item) => (
         <li key={item.lang}>
-          {toLanguageDisplayName(item.lang, languageMetadata)}: {formatGapRecommendation(item.marginalGain, item.estimatedPopulationGain)}
+          {renderSelectableLabel(toLanguageDisplayName(item.lang, languageMetadata), item.lang, onAddLanguage)}: {formatGapRecommendation(item.marginalGain, item.estimatedPopulationGain)}
         </li>
       ))}
     </ul>
@@ -103,7 +125,7 @@ export function CountriesOnlyStateView(props: CountriesOnlyStateViewProps) {
         )}
         {!props.exploreLoading && props.topLanguages.map((entry) => (
           <li key={entry.lang}>
-            {toLanguageDisplayName(entry.lang, props.languageMetadata)}: {Math.round(entry.prevalence * 100)}%
+            {renderSelectableLabel(toLanguageDisplayName(entry.lang, props.languageMetadata), entry.lang, props.onAddLanguage)}: {Math.round(entry.prevalence * 100)}%
           </li>
         ))}
       </ul>
@@ -126,11 +148,11 @@ export function LanguageViewState(props: LanguageViewStateProps) {
       {props.hasSingleCountry ? (
         <>
           <ul className="breakdownList text-left mt-4">
-            <li>Reachable: ~{props.regionalReachablePopulation.toLocaleString()}</li>
-            <li>Unreachable: ~{props.regionalUnreachablePopulation.toLocaleString()}</li>
+            <li>Reachable: {formatCompactPopulation(props.regionalReachablePopulation)}</li>
+            <li>Unreachable: {formatCompactPopulation(props.regionalUnreachablePopulation)}</li>
           </ul>
           <h4 className="text-left mt-4">Incremental Reach</h4>
-          {renderGapRecommendations(props.gapLoading, props.gap, props.languageMetadata)}
+          {renderGapRecommendations(props.gapLoading, props.gap, props.languageMetadata, props.onAddLanguage)}
         </>
       ) : (
         <>
@@ -139,7 +161,13 @@ export function LanguageViewState(props: LanguageViewStateProps) {
             {props.topContributors.length === 0 && <div className="barRow">No data yet.</div>}
             {props.topContributors.map((entry) => (
               <div className="barRow" key={entry.countryID}>
-                <span className="barLabel">{toCountryDisplayName(entry.countryID, props.countryMetadata)}</span>
+                <span className="barLabel">
+                  {renderSelectableLabel(
+                    toCountryDisplayName(entry.countryID, props.countryMetadata),
+                    entry.countryID,
+                    props.onAddCountry
+                  )}
+                </span>
                 <div className="barTrack">
                   <div
                     className="barFill"
@@ -153,7 +181,7 @@ export function LanguageViewState(props: LanguageViewStateProps) {
           {props.hasCountries && (
             <>
               <h4 className="text-left mt-4">Incremental Reach</h4>
-              {renderGapRecommendations(props.gapLoading, props.gap, props.languageMetadata)}
+              {renderGapRecommendations(props.gapLoading, props.gap, props.languageMetadata, props.onAddLanguage)}
             </>
           )}
         </>

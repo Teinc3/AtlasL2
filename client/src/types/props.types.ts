@@ -46,6 +46,7 @@ export type CountriesOnlyStateViewProps = {
   topLanguages: RegionalDistribution[];
   exploreLoading: boolean;
   languageMetadata: LanguageMetadataMap;
+  onAddLanguage?: (languageID: string) => void;
 };
 
 export type LanguageViewStateProps = {
@@ -62,4 +63,6 @@ export type LanguageViewStateProps = {
   topContributors: TopContributingRegion[];
   countryMetadata: CountryMetadataMap;
   hasCountries: boolean;
+  onAddLanguage?: (languageID: string) => void;
+  onAddCountry?: (countryID: string) => void;
 };

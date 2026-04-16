@@ -215,6 +215,22 @@
   color: var(--dimmed-white);
 }
 
+.inlineActionLabel {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.inlineActionLabel:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
 .barTrack {
   flex-grow: 1;
   min-width: 0;

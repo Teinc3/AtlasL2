@@ -1,4 +1,4 @@
-import { toSignificantFigures } from '../utils';
+import { normalizePrevalence, toSignificantFigures } from '../utils';
 
 import type { ExploreResponse, RegionalDistribution } from '@atlasl2/shared';
 import type { AppData } from '../types';
@@ -30,7 +30,7 @@ export function buildExploreResponse(dataStore: AppData, targets: string[]): Exp
   const topLanguages: RegionalDistribution[] = Object.entries(weightedLanguageCounts)
     .map(([lang, speakers]) => ({
       lang,
-      prevalence: selectedPopulation > 0 ? speakers / selectedPopulation : 0,
+      prevalence: normalizePrevalence(speakers, selectedPopulation),
       population: toSignificantFigures(speakers),
     }))
     .sort((left, right) => right.prevalence - left.prevalence)

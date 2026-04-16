@@ -16,6 +16,7 @@ export default function InfoPanel(props: BasePanelProps) {
     isInfoPanelOpen: isOpen,
     setIsInfoPanelOpen: setIsOpen,
     selectedCountries, selectedLanguages,
+    addLanguage, addCountry,
     focusedCountryId,
     countryMetadata, languageMetadata,
     reach, gap, explore,
@@ -86,6 +87,7 @@ export default function InfoPanel(props: BasePanelProps) {
               topLanguages={explore?.topLanguages ?? []}
               exploreLoading={exploreLoading}
               languageMetadata={languageMetadata}
+              onAddLanguage={addLanguage}
             />
           </div>
         </div>
@@ -106,6 +108,8 @@ export default function InfoPanel(props: BasePanelProps) {
               topContributors={reach?.topContributingRegions ?? []}
               countryMetadata={countryMetadata}
               hasCountries={hasCountries}
+              onAddLanguage={addLanguage}
+              onAddCountry={addCountry}
             />
           </div>
         </div>

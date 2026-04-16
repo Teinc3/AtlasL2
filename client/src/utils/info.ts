@@ -24,7 +24,7 @@ export function formatGapRecommendation(marginalGain: number, estimatedPopulatio
     return `+${percentGain}%`;
   }
 
-  return `+${percentGain}% (~${estimatedPopulationGain.toLocaleString()})`;
+  return `+${percentGain}% (${formatCompactPopulation(estimatedPopulationGain)})`;
 }
 
 export function formatPPPBillions(value: number | null): string {
