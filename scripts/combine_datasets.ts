@@ -6,7 +6,9 @@ import countries3to2 from 'countries-list/minimal/countries.3to2.min.json' with 
 import { iso6393To1 } from 'iso-639-3';
 
 import type {
-  CombinedData, CombinedLanguageData, CountryLanguageData, RawLanguageFile, UnicodeData
+  CombinedData, CombinedLanguageData, 
+  CountryLanguageData, PatchesData,
+  RawLanguageFile, UnicodeData
 } from '@atlasl2/shared';
 
 
@@ -14,6 +16,7 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, '..');
 
 const unicodeFilePath = path.join(repoRoot, 'data/countries/unicode.json');
+const patchesFilePath = path.join(repoRoot, 'data/patches/languages.json');
 const outputDir = path.join(repoRoot, 'data/languages/output');
 const combinedLanguagesOut = path.join(repoRoot, 'data/combined_languages.json');
 const combinedDataOut = path.join(repoRoot, 'data/combined_data.json');
@@ -135,6 +138,8 @@ async function main() {
 
   const unicodeRaw = await readFile(unicodeFilePath, 'utf8');
   const unicodeData = JSON.parse(unicodeRaw) as UnicodeData;
+  const patchesRaw = await readFile(patchesFilePath, 'utf8');
+  const patchesData = JSON.parse(patchesRaw) as PatchesData;
   const outputFiles = (await readdir(outputDir))
     .filter((fileName) => fileName.endsWith('.json'))
     .sort();
@@ -142,6 +147,8 @@ async function main() {
   const sourceHash = createHash('sha256');
   sourceHash.update(`unicode:${path.relative(repoRoot, unicodeFilePath)}\n`);
   sourceHash.update(unicodeRaw);
+  sourceHash.update(`\npatches:${path.relative(repoRoot, patchesFilePath)}\n`);
+  sourceHash.update(patchesRaw);
 
   const combinedLanguages: CombinedLanguageData = {};
   const combinedData: CombinedData = {
@@ -171,6 +178,9 @@ async function main() {
       const unicodeTotal = resolveUnicodePopulation(unicodeData, countryAlpha2, targetCodes);
       const { flag_reason: flagReason, total: ethTotal } = ethStats;
       const combinedTotal = Math.max(ethTotal, unicodeTotal);
+      const patchEntry = patchesData[langISO3Code]?.[countryAlpha3];
+      const patchTotal = patchEntry && typeof patchEntry.total === 'number' ? patchEntry.total : undefined;
+      const finalTotal = patchTotal ?? combinedTotal;
 
       const countryRecord: CountryLanguageData = {
         ethnologue: {
@@ -185,10 +195,16 @@ async function main() {
           flag_reason: undefined,
           total: -1,
         }, // Ensure order
-        total: combinedTotal,
+        total: finalTotal,
       };
 
-      if (countryRecord.patch && (ethStats.flag_for_review || flagReason)) {
+      if (countryRecord.patch && patchEntry) {
+        countryRecord.patch.flag_reason = patchEntry.flag_reason;
+        countryRecord.patch.total = patchTotal ?? finalTotal;
+        if (patchEntry.resolve_reason) {
+          countryRecord.patch.resolve_reason = patchEntry.resolve_reason;
+        }
+      } else if (countryRecord.patch && (ethStats.flag_for_review || flagReason)) {
         if (flagReason) {
           countryRecord.patch.flag_reason = flagReason;
         } else {
@@ -203,12 +219,12 @@ async function main() {
       if (!combinedData.languages[langISO3Code]) {
         combinedData.languages[langISO3Code] = {};
       }
-      combinedData.languages[langISO3Code][countryAlpha3] = combinedTotal;
+      combinedData.languages[langISO3Code][countryAlpha3] = finalTotal;
 
       if (!combinedData.countries[countryAlpha3]) {
         combinedData.countries[countryAlpha3] = {};
       }
-      combinedData.countries[countryAlpha3][langISO3Code] = combinedTotal;
+      combinedData.countries[countryAlpha3][langISO3Code] = finalTotal;
     }
 
     combinedLanguages[langISO3Code] = countryObj;

@@ -13,9 +13,11 @@
     "dev:client": "npm run dev -w @atlasl2/client",
     "dev:server": "npm run dev -w @atlasl2/server",
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "data": "npm run data:combine && npm run data:expand && npm run data:metadata",
     "data:combine": "tsx --tsconfig scripts/tsconfig.scripts.json scripts/combine_datasets.ts",
     "data:expand": "tsx --tsconfig scripts/tsconfig.scripts.json scripts/expand_edges.ts",
-    "data:metadata": "tsx --tsconfig scripts/tsconfig.scripts.json scripts/generate_metadata.ts"
+    "data:metadata": "tsx --tsconfig scripts/tsconfig.scripts.json scripts/generate_metadata.ts",
+    "data:delete": "cd data && rm -f combined_data.json combined_languages.json country_metadata.json language_metadata.json relation_map.json"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

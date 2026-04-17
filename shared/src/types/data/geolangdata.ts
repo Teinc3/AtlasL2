@@ -44,6 +44,15 @@ export interface EthnologueSourceData extends BaseSourceData {
 
 export interface PatchData extends BaseSourceData, Partial<FlaggedData> {}
 
+export interface PatchFileEntry extends Partial<FlaggedData>, Partial<BaseSourceData> {
+  flag_reason: FlaggedData['flag_reason'];
+}
+
+export type PatchesData<
+  LangISO3Codes extends string = string,
+  CountryISO3Codes extends string = string,
+> = Record<LangISO3Codes, Record<CountryISO3Codes, PatchFileEntry>>;
+
 export interface FlaggedData {
   /** Nonsensical data flagged by AI for manual review */
   flag_reason: string;
