@@ -1,5 +1,5 @@
 import { buildCountryReach } from './probability';
-import { toSignificantFigures } from '../utils';
+import { toSigFig } from '../utils';
 
 import type { 
   ReachCountryMetrics, ReachRequest, ReachResponse, TopContributingRegion
@@ -32,8 +32,8 @@ export function computeReach(
     }
 
     const reach = buildCountryReach(dataStore, target, languages);
-    const reachable = toSignificantFigures(country.population * reach);
-    const unreachable = toSignificantFigures(Math.max(0, country.population - (country.population * reach)));
+    const reachable = toSigFig(country.population * reach);
+    const unreachable = toSigFig(Math.max(0, country.population - (country.population * reach)));
 
     breakdown[target] = {
       score: reach,
@@ -46,7 +46,7 @@ export function computeReach(
       topContributingRegions.push({
         countryID: target,
         score: reach,
-        estimatedSpeakers: toSignificantFigures(estimatedSpeakers),
+        estimatedSpeakers: toSigFig(estimatedSpeakers),
       });
     }
 

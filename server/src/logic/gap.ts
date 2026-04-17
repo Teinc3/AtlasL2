@@ -1,5 +1,5 @@
 import { computeReach } from './reach';
-import { toSignificantFigures } from '../utils';
+import { toSigFig } from '../utils';
 
 import type { GapRequest, GapResponse } from '@atlasl2/shared';
 import type { AppData } from '../types';
@@ -32,7 +32,7 @@ export function buildGapResponse(dataStore: AppData, body: GapRequest): GapRespo
         lang: language.id,
         potentialReach,
         marginalGain,
-        estimatedPopulationGain: toSignificantFigures(
+        estimatedPopulationGain: toSigFig(
           scopePopulation * marginalGain
         ),
       };

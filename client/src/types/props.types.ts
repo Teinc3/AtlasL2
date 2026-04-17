@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import type { 
   CountryMetadata, CountryMetadataMap, LanguageMetadataMap, 
   GapResponse, RegionalDistribution, TopContributingRegion
@@ -51,7 +50,7 @@ export type CountriesOnlyStateViewProps = {
 
 export type LanguageViewStateProps = {
   languageViewTitle: string;
-  scoreDonutStyle: CSSProperties;
+  selectedLanguagesCount: number;
   reachLoading: boolean;
   circleScorePct: number | null;
   hasSingleCountry: boolean;
@@ -62,7 +61,8 @@ export type LanguageViewStateProps = {
   languageMetadata: LanguageMetadataMap;
   topContributors: TopContributingRegion[];
   countryMetadata: CountryMetadataMap;
-  hasCountries: boolean;
+  topLanguages: RegionalDistribution[];
+  exploreLoading: boolean;
   onAddLanguage?: (languageID: string) => void;
   onAddCountry?: (countryID: string) => void;
 };

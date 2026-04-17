@@ -4,18 +4,41 @@ import { CommunicativeMode } from '@atlasl2/shared';
 import { fetchExplore, fetchGap, fetchReach } from '../api';
 
 import type { ExploreResponse, GapResponse, ReachResponse } from '@atlasl2/shared';
+import type { EndpointLifecycle } from '../types';
+
+
+const ADAPTIVE_WINDOW_MS = 5000;
+const DEBOUNCE_MS = 600;
+const IMMEDIATE_CHANGES = 3;
+const HALF_DEBOUNCE_CHANGES = 6;
+
+
+function toErrorMessage(reason: unknown, fallback: string): string {
+	return reason instanceof Error ? reason.message : fallback;
+}
+
+function applyEndpointLifecycle<T>(config: EndpointLifecycle<T>): void {
+	if (!config.enabled) {
+		return;
+	}
+
+	if (config.result.status === 'fulfilled' && config.result.value) {
+		config.setValue(config.result.value);
+		return;
+	}
+
+	if (config.result.status === 'rejected') {
+		config.setError(toErrorMessage(config.result.reason, config.errorFallback));
+	}
+}
 
 
 export default function useIndices(
 	selectedLanguages: string[],
 	selectedCountries: string[],
-	options?: Partial<{
-		mode: CommunicativeMode;
-		debounceMs: number;
-	}>
+	mode?: CommunicativeMode
 ) {
-	const mode = options?.mode ?? CommunicativeMode.Active;
-	const debounceMs = options?.debounceMs ?? 600;
+  mode ??= CommunicativeMode.Active;
 
 	const [reach, setReach] = useState<ReachResponse | null>(null);
 	const [gap, setGap] = useState<GapResponse | null>(null);
@@ -34,55 +57,66 @@ export default function useIndices(
 		() => `${languageIds.join('|')}::${countryIds.join('|')}::${mode}`,
 		[languageIds, countryIds, mode]
 	);
+	const resetAllState = useCallback(() => {
+		setReach(null);
+		setGap(null);
+		setExplore(null);
+		setReachError(null);
+		setGapError(null);
+		setExploreError(null);
+		setIsLoadingReach(false);
+		setIsLoadingGap(false);
+		setIsLoadingExplore(false);
+	}, []);
+	const setInitialLoadingAndErrors = useCallback((hasLanguages: boolean, hasExplore: boolean) => {
+		setIsLoadingReach(hasLanguages);
+		setIsLoadingGap(hasLanguages);
+		setIsLoadingExplore(hasExplore);
+		setReachError(null);
+		setGapError(null);
+		setExploreError(null);
+	}, []);
+	const setLoadingForDebounceWindow = useCallback((hasLanguages: boolean, hasExplore: boolean) => {
+		if (hasLanguages) {
+			setIsLoadingReach(true);
+			setIsLoadingGap(true);
+		}
+		if (hasExplore) {
+			setIsLoadingExplore(true);
+		}
+	}, []);
 
 	const getAdaptiveDebounceMs = useCallback(() => {
 		const now = Date.now();
-		const windowMs = 5000;
-		const recentChanges = changeTimesRef.current.filter(timestamp => now - timestamp < windowMs);
+		const recentChanges = changeTimesRef.current.filter(timestamp => now - timestamp < ADAPTIVE_WINDOW_MS);
 		recentChanges.push(now);
 		changeTimesRef.current = recentChanges;
 
-		if (recentChanges.length <= 3) {
+		if (recentChanges.length <= IMMEDIATE_CHANGES) {
 			return 0;
-		} else if (recentChanges.length <= 6) {
-      return debounceMs / 2;
+		} else if (recentChanges.length <= HALF_DEBOUNCE_CHANGES) {
+      return DEBOUNCE_MS / 2;
     } else {
-      return debounceMs;
+      return DEBOUNCE_MS;
     }
-	}, [debounceMs]);
+	}, [DEBOUNCE_MS]);
 
 	const loadIndices = useCallback(async (signal: AbortSignal) => {
 		const hasLanguages = languageIds.length > 0;
 		const hasCountries = countryIds.length > 0;
+		const hasExplore = hasLanguages || hasCountries;
 
-		if (!hasLanguages && !hasCountries) {
-			setReach(null);
-			setGap(null);
-			setExplore(null);
-			setReachError(null);
-			setGapError(null);
-			setExploreError(null);
-			setIsLoadingReach(false);
-			setIsLoadingGap(false);
-			setIsLoadingExplore(false);
+		if (!hasExplore) {
+			resetAllState();
 			return;
 		}
 
 		const requestId = ++requestIdRef.current;
-		setIsLoadingReach(hasLanguages);
-		setIsLoadingGap(hasLanguages);
-		setIsLoadingExplore(hasCountries && !hasLanguages);
-		setReachError(null);
-		setGapError(null);
-		setExploreError(null);
+		setInitialLoadingAndErrors(hasLanguages, hasExplore);
 
 		if (!hasLanguages) {
 			setReach(null);
 			setGap(null);
-		}
-
-		if (!hasCountries) {
-			setExplore(null);
 		}
 
 		try {
@@ -93,8 +127,11 @@ export default function useIndices(
 				hasLanguages
 					? fetchGap({ currentLangs: languageIds, targets: countryIds }, { signal })
 					: Promise.resolve(null),
-				(hasCountries && !hasLanguages)
-					? fetchExplore(countryIds, { signal })
+				hasExplore
+					? fetchExplore({
+						countries: countryIds,
+						...(hasLanguages ? { languages: languageIds } : {}),
+					}, { signal })
 					: Promise.resolve(null),
 			]);
 
@@ -102,23 +139,29 @@ export default function useIndices(
 				return;
 			}
 
-			if (hasLanguages && reachResult.status === 'fulfilled' && reachResult.value) {
-				setReach(reachResult.value);
-			} else if (hasLanguages && reachResult.status === 'rejected') {
-				setReachError(reachResult.reason instanceof Error ? reachResult.reason.message : 'Failed to load reach data');
-			}
+			applyEndpointLifecycle({
+				enabled: hasLanguages,
+				result: reachResult,
+				setValue: setReach,
+				setError: setReachError,
+				errorFallback: 'Failed to load reach data',
+			});
 
-			if (hasLanguages && gapResult.status === 'fulfilled' && gapResult.value) {
-				setGap(gapResult.value);
-			} else if (hasLanguages && gapResult.status === 'rejected') {
-				setGapError(gapResult.reason instanceof Error ? gapResult.reason.message : 'Failed to load gap data');
-			}
+			applyEndpointLifecycle({
+				enabled: hasLanguages,
+				result: gapResult,
+				setValue: setGap,
+				setError: setGapError,
+				errorFallback: 'Failed to load gap data',
+			});
 
-			if (hasCountries && !hasLanguages && exploreResult.status === 'fulfilled' && exploreResult.value) {
-				setExplore(exploreResult.value);
-			} else if (hasCountries && !hasLanguages && exploreResult.status === 'rejected') {
-				setExploreError(exploreResult.reason instanceof Error ? exploreResult.reason.message : 'Failed to load explore data');
-			}
+			applyEndpointLifecycle({
+				enabled: hasExplore,
+				result: exploreResult,
+				setValue: setExplore,
+				setError: setExploreError,
+				errorFallback: 'Failed to load explore data',
+			});
 		} finally {
 			if (!signal.aborted && requestId === requestIdRef.current) {
 				setIsLoadingReach(false);
@@ -126,18 +169,15 @@ export default function useIndices(
 				setIsLoadingExplore(false);
 			}
 		}
-	}, [languageIds, countryIds, mode]);
+	}, [languageIds, countryIds, mode, resetAllState, setInitialLoadingAndErrors]);
 
 	useEffect(() => {
-		if (languageIds.length > 0 || countryIds.length > 0) {
+		const hasLanguages = languageIds.length > 0;
+		const hasExplore = hasLanguages || countryIds.length > 0;
+
+		if (hasExplore) {
 			// Mark loading immediately when a new request cycle begins (including debounce period)
-			if (languageIds.length > 0) {
-				setIsLoadingReach(true);
-				setIsLoadingGap(true);
-			}
-			if (countryIds.length > 0 && languageIds.length === 0) {
-				setIsLoadingExplore(true);
-			}
+			setLoadingForDebounceWindow(hasLanguages, hasExplore);
 		}
 
 		const controller = new AbortController();
@@ -149,14 +189,9 @@ export default function useIndices(
 			controller.abort();
 			clearTimeout(timeoutId);
 		};
-	}, [requestKey, loadIndices, languageIds.length, countryIds.length, getAdaptiveDebounceMs]);
+	}, [requestKey, loadIndices, languageIds, countryIds, getAdaptiveDebounceMs, setLoadingForDebounceWindow]);
 
-	const refetchReach = useCallback(async () => {
-		const controller = new AbortController();
-		await loadIndices(controller.signal);
-	}, [loadIndices]);
-
-	const refetchGap = useCallback(async () => {
+	const refetch = useCallback(async () => {
 		const controller = new AbortController();
 		await loadIndices(controller.signal);
 	}, [loadIndices]);
@@ -165,6 +200,7 @@ export default function useIndices(
 		reach, gap, explore,
 		isLoadingReach, isLoadingGap, isLoadingExplore,
 		reachError, gapError, exploreError,
-		refetchReach, refetchGap
+		refetchReach: refetch,
+		refetchGap: refetch,
 	};
 }

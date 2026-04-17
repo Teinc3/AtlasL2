@@ -2,41 +2,28 @@ import fastifyPlugin from 'fastify-plugin';
 import { Type } from '@sinclair/typebox';
 
 import {
-  ExploreQuerySchema, ExploreResponseSchema,
+  ExploreRequestSchema, ExploreResponseSchema,
   GapRequestSchema, GapResponseSchema,
   ReachRequestSchema, ReachResponseSchema,
 } from '@atlasl2/shared';
 import { 
-  buildExploreResponse, buildGapResponse, buildReachResponse, findUnknownTargets
+  buildExploreResponse, buildGapResponse, buildReachResponse
 } from '../logic';
-import { parseTargetCodes } from '../utils';
 
-import type { ExploreQuery, GapRequest, ReachRequest } from '@atlasl2/shared';
+import type { ExploreRequest, GapRequest, ReachRequest } from '@atlasl2/shared';
 
 
 export default fastifyPlugin(async (app) => {
-  app.get('/api/0/explore', {
+  app.post('/api/0/explore', {
     schema: {
-      querystring: ExploreQuerySchema,
+      body: ExploreRequestSchema,
       response: {
         200: ExploreResponseSchema,
-        404: Type.Object({
-          message: Type.String(),
-        }),
       },
     },
-  }, async (request, reply) => {
-    const { targets } = request.query as ExploreQuery;
-    const requestedTargets = parseTargetCodes(targets);
-    const unknownTargets = findUnknownTargets(app.dataStore, requestedTargets);
-
-    if (unknownTargets.length > 0) {
-      return reply.status(404).send({
-        message: `Unknown targets: ${unknownTargets.join(', ')}`,
-      });
-    }
-
-    return buildExploreResponse(app.dataStore, requestedTargets);
+  }, async (request) => {
+    const { countries, languages } = request.body as ExploreRequest;
+    return buildExploreResponse(app.dataStore, { countries, languages });
   });
 
   app.post('/api/0/reach', {

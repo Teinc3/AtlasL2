@@ -1,40 +1,62 @@
-import { normalizePrevalence, toSignificantFigures } from '../utils';
+import { normalizePrevalence, toSigFig } from '../utils';
 
-import type { ExploreResponse, RegionalDistribution } from '@atlasl2/shared';
+import type { ExploreRequest, ExploreResponse, RegionalDistribution } from '@atlasl2/shared';
 import type { AppData } from '../types';
 
 
-export function findUnknownTargets(dataStore: AppData, targets: string[]): string[] {
-  return targets.filter((countryCode) => !dataStore.countryMetadata[countryCode]);
+export function findUnknownCountries(dataStore: AppData, countries: string[]): string[] {
+  return countries.filter((countryCode) => !dataStore.countryMetadata[countryCode]);
 }
 
-export function buildExploreResponse(dataStore: AppData, targets: string[]): ExploreResponse {
-  const selectedTargets = targets.length > 0 ? targets : Object.keys(dataStore.countryMetadata);
-  const weightedLanguageCounts: Record<string, number> = {};
-  let selectedPopulation = 0;
+export function findUnknownLanguages(dataStore: AppData, languages: string[]): string[] {
+  return languages.filter((languageCode) => !dataStore.languageMetadata[languageCode]);
+}
 
-  for (const target of selectedTargets) {
-    const population = dataStore.countryMetadata[target]?.population ?? 0;
-    if (!population) {
-      continue;
-    }
+function sumCountryPopulation(dataStore: AppData, countries: string[]): number {
+  return countries.reduce((sum, countryCode) => {
+    const country = dataStore.countryMetadata[countryCode];
+    return sum + (country?.population ?? 0);
+  }, 0);
+}
 
-    selectedPopulation += population;
-    const countryLangMap = dataStore.combinedData.countries[target] ?? {};
+function sumLangSpeakers(dataStore: AppData, languageCode: string, countries: string[]): number {
+  return countries.reduce((sum, countryCode) => {
+    return sum + (dataStore.combinedData.languages[languageCode]?.[countryCode] ?? 0);
+  }, 0);
+}
 
-    for (const [lang, speakers] of Object.entries(countryLangMap)) {
-      weightedLanguageCounts[lang] = (weightedLanguageCounts[lang] ?? 0) + speakers;
-    }
-  }
+export function buildExploreResponse(dataStore: AppData, body: ExploreRequest): ExploreResponse {
+  const selectedCountries = body.countries.length > 0 ? body.countries : Object.keys(dataStore.countryMetadata);
+  const selectedLanguages = body.languages ?? []
+  const selectedPopulation = sumCountryPopulation(dataStore, selectedCountries);
 
-  const topLanguages: RegionalDistribution[] = Object.entries(weightedLanguageCounts)
-    .map(([lang, speakers]) => ({
-      lang,
-      prevalence: normalizePrevalence(speakers, selectedPopulation),
-      population: toSignificantFigures(speakers),
-    }))
-    .sort((left, right) => right.prevalence - left.prevalence)
-    .slice(0, 5);
+  // If selected languages, return breakdown of those languages within the countries
+  // Otherwise return top 5 languages across that selected country.
+  const topLanguages: RegionalDistribution[] = selectedLanguages.length > 0
+    ? selectedLanguages.map(lang => {
+      const speakers = toSigFig(sumLangSpeakers(dataStore, lang, selectedCountries));
+      return {
+        lang,
+        prevalence: normalizePrevalence(speakers, selectedPopulation),
+        population: speakers,
+      };
+    })
+    : Object.entries(selectedCountries.reduce<Record<string, number>>((counts, countryCode) => {
+      const countryLangMap = dataStore.combinedData.countries[countryCode] ?? {};
+
+      for (const [languageCode, speakers] of Object.entries(countryLangMap)) {
+        counts[languageCode] = (counts[languageCode] ?? 0) + speakers;
+      }
+
+      return counts;
+    }, {}))
+      .map(([languageCode, speakers]) => ({
+        lang: languageCode,
+        prevalence: normalizePrevalence(speakers, selectedPopulation),
+        population: toSigFig(speakers),
+      }))
+      .sort((left, right) => right.prevalence - left.prevalence)
+      .slice(0, 5);
 
   return {
     selectedPopulation,

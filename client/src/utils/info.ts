@@ -86,19 +86,36 @@ export function buildSingleCountryPrimaryScripts(
 }
 
 export function computeLanguageViewTitle(
+  selectedLanguages: string[],
+  languageMetadata: LanguageMetadataMap,
   hasCountries: boolean,
   hasSingleCountry: boolean,
   primaryCountry: CountryMetadata | null,
   selectedCountries: string[],
   countryMetadata: CountryMetadataMap
 ): string {
+  const isSingleLanguage = selectedLanguages.length === 1;
+  const countryName = primaryCountry?.name ?? toCountryDisplayName(selectedCountries[0], countryMetadata);
+
+  if (isSingleLanguage) {
+    const languageName = toLanguageDisplayName(selectedLanguages[0], languageMetadata);
+
+    if (!hasCountries) {
+      return `Global Footprint for ${languageName}`;
+    }
+    if (hasSingleCountry) {
+      return `${languageName} Footprint in ${countryName}`;
+    }
+    return `Regional Footprint for ${languageName}`;
+  }
+
   if (!hasCountries) {
-    return "Global Linguistic Footprint";
+    return "Global Language Footprint";
   }
 
   if (hasSingleCountry) {
-    return `Selected Country: ${primaryCountry?.name ?? toCountryDisplayName(selectedCountries[0], countryMetadata)}`;
+    return `Language Footprint in ${countryName}`;
   }
 
-  return "Selected Region";
+  return "Regional Language Footprint";
 }

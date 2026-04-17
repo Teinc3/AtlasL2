@@ -46,6 +46,26 @@ function renderGapRecommendations(
   );
 }
 
+function renderExploreLanguageBreakdown(
+  exploreLoading: boolean,
+  topLanguages: { lang: string; population: number }[],
+  languageMetadata: LanguageViewStateProps["languageMetadata"],
+  onAddLanguage?: LanguageViewStateProps["onAddLanguage"],
+  className = "breakdownList",
+) {
+  return (
+    <ul className={className}>
+      {exploreLoading && <li>Loading...</li>}
+      {!exploreLoading && topLanguages.length === 0 && <li>No language breakdown available.</li>}
+      {!exploreLoading && topLanguages.map((entry) => (
+        <li key={entry.lang}>
+          {renderSelectableLabel(toLanguageDisplayName(entry.lang, languageMetadata), entry.lang, onAddLanguage)}: {formatCompactPopulation(entry.population)}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function CountriesOnlyStateView(props: CountriesOnlyStateViewProps) {
   return (
     <div className="infoState">
@@ -112,49 +132,38 @@ export function CountriesOnlyStateView(props: CountriesOnlyStateViewProps) {
         <div className="statBlock">
           <h4>Total Population</h4>
           <div className="value">
-            {props.metadataLoading || props.exploreLoading ? "Loading..." : props.selectedPopulation.toLocaleString()}
+            {props.metadataLoading || props.exploreLoading ? "Loading..." : formatCompactPopulation(props.selectedPopulation)}
           </div>
         </div>
       )}
 
       <h4>Top Languages</h4>
-      <ul className="breakdownList">
-        {props.exploreLoading && <li>Loading...</li>}
-        {!props.exploreLoading && props.topLanguages.length === 0 && (
-          <li>No language breakdown available.</li>
-        )}
-        {!props.exploreLoading && props.topLanguages.map((entry) => (
-          <li key={entry.lang}>
-            {renderSelectableLabel(toLanguageDisplayName(entry.lang, props.languageMetadata), entry.lang, props.onAddLanguage)}: {Math.round(entry.prevalence * 100)}%
-          </li>
-        ))}
-      </ul>
+      {renderExploreLanguageBreakdown(
+        props.exploreLoading,
+        props.topLanguages,
+        props.languageMetadata,
+        props.onAddLanguage,
+      )}
     </div>
   );
 }
 
 export function LanguageViewState(props: LanguageViewStateProps) {
+  const reachableLoading = props.reachLoading || props.exploreLoading;
+  const unreachableLoading = props.reachLoading || props.exploreLoading;
+
   return (
     <div className="infoState text-center">
       <h3>{props.languageViewTitle}</h3>
 
-      <div className="scoreDonut" style={props.scoreDonutStyle}>
+      <div className="scoreDonut" style={{ '--score-pct': `${props.circleScorePct ?? 0}%` } as React.CSSProperties}>
         <div className="scoreDonutInner">
           {props.reachLoading ? "..." : (props.circleScorePct !== null ? props.circleScorePct : "N/A")}
         </div>
       </div>
       <div className="metricLabel">Communicability Index</div>
 
-      {props.hasSingleCountry ? (
-        <>
-          <ul className="breakdownList text-left mt-4">
-            <li>Reachable: {formatCompactPopulation(props.regionalReachablePopulation)}</li>
-            <li>Unreachable: {formatCompactPopulation(props.regionalUnreachablePopulation)}</li>
-          </ul>
-          <h4 className="text-left mt-4">Incremental Reach</h4>
-          {renderGapRecommendations(props.gapLoading, props.gap, props.languageMetadata, props.onAddLanguage)}
-        </>
-      ) : (
+      {!props.hasSingleCountry && (
         <>
           <h4 className="text-left mt-4">Top Contributing Regions</h4>
           <div className="barChartPlaceholder">
@@ -178,14 +187,43 @@ export function LanguageViewState(props: LanguageViewStateProps) {
               </div>
             ))}
           </div>
-          {props.hasCountries && (
-            <>
-              <h4 className="text-left mt-4">Incremental Reach</h4>
-              {renderGapRecommendations(props.gapLoading, props.gap, props.languageMetadata, props.onAddLanguage)}
-            </>
-          )}
         </>
       )}
+
+      {props.selectedLanguagesCount > 1 ? (
+        <details className="expandableSection text-left mt-4">
+          <summary>
+            <span className="expandableLabel">Reachable Population:</span>{' '}
+            <span className="expandableValue">
+              {reachableLoading ? "Loading..." : formatCompactPopulation(props.regionalReachablePopulation)}
+            </span>
+          </summary>
+          {renderExploreLanguageBreakdown(
+            props.exploreLoading,
+            props.topLanguages,
+            props.languageMetadata,
+            props.onAddLanguage,
+            "breakdownList text-left",
+          )}
+        </details>
+      ) : (
+        <div className="expandableSection text-left mt-4">
+          <span className="expandableLabel">Reachable Population:</span>{' '}
+          <span className="expandableValue">
+            {reachableLoading ? "Loading..." : formatCompactPopulation(props.regionalReachablePopulation)}
+          </span>
+        </div>
+      )}
+
+      <details className="expandableSection text-left mt-4" open>
+        <summary>
+          <span className="expandableLabel">Unreachable Population:</span>{' '}
+          <span className="expandableValue">
+            {unreachableLoading ? "Loading..." : formatCompactPopulation(props.regionalUnreachablePopulation)}
+          </span>
+        </summary>
+        {renderGapRecommendations(props.gapLoading, props.gap, props.languageMetadata, props.onAddLanguage)}
+      </details>
     </div>
   );
 }

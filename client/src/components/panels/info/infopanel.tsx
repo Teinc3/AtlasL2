@@ -7,7 +7,6 @@ import { CountriesOnlyStateView, LanguageViewState } from "./infoviews";
 
 import "./infopanel.css"
 
-import type { CSSProperties } from "react";
 import type { BasePanelProps } from "../../../types";
 
 
@@ -28,20 +27,20 @@ export default function InfoPanel(props: BasePanelProps) {
   const hasLanguages = selectedLanguages.length > 0;
   const hasCountries = selectedCountries.length > 0;
   const hasSingleCountry = selectedCountries.length === 1;
-  const showS0 = !hasLanguages && !hasCountries;
-  const showS1 = !hasLanguages && hasCountries;
-  const showLanguageView = hasLanguages;
   const languageViewTitle = computeLanguageViewTitle(
+    selectedLanguages,
+    languageMetadata,
     hasCountries,
     hasSingleCountry,
     primaryCountry,
     selectedCountries,
-    countryMetadata
+    countryMetadata,
   );
   const primaryCountryReach = primaryCountryID ? reach?.breakdown[primaryCountryID] : undefined;
   const circleScore = hasSingleCountry ? primaryCountryReach?.score : reach?.globalIndex;
-  const circleScorePct = circleScore !== undefined ? Math.round(circleScore * 100) : null;
-  const scoreDonutStyle = { '--score-pct': `${circleScorePct ?? 0}%` } as CSSProperties;
+  const selectedPopulation = explore?.selectedPopulation ?? 0;
+  const regionalReachablePopulation = circleScore !== undefined ? Math.round(selectedPopulation * circleScore) : 0;
+  const regionalUnreachablePopulation = Math.max(0, selectedPopulation - regionalReachablePopulation);
 
   const scriptDisplayNames = new Intl.DisplayNames(['en'], { type: 'script' })
   const englishLanguageDisplayNames = new Intl.DisplayNames(['en'], { type: 'language' })
@@ -63,7 +62,7 @@ export default function InfoPanel(props: BasePanelProps) {
       </button>
 
       <div className="infoPanelContent">
-        <div className={`stateWrapper ${showS0 ? 'active' : ''}`}>
+        <div className={`stateWrapper ${!hasLanguages && !hasCountries ? 'active' : ''}`}>
           <div className="stateContent">
             <div className="infoState helperState">
               <p>
@@ -74,7 +73,7 @@ export default function InfoPanel(props: BasePanelProps) {
           </div>
         </div>
 
-        <div className={`stateWrapper ${showS1 ? 'active' : ''}`}>
+        <div className={`stateWrapper ${!hasLanguages && hasCountries ? 'active' : ''}`}>
           <div className="stateContent">
             <CountriesOnlyStateView
               hasSingleCountry={hasSingleCountry}
@@ -92,22 +91,23 @@ export default function InfoPanel(props: BasePanelProps) {
           </div>
         </div>
 
-        <div className={`stateWrapper ${showLanguageView ? 'active' : ''}`}>
+        <div className={`stateWrapper ${hasLanguages ? 'active' : ''}`}>
           <div className="stateContent">
             <LanguageViewState
               languageViewTitle={languageViewTitle}
-              scoreDonutStyle={scoreDonutStyle}
+              selectedLanguagesCount={selectedLanguages.length}
               reachLoading={reachLoading}
-              circleScorePct={circleScorePct}
+              circleScorePct={circleScore !== undefined ? Math.round(circleScore * 100) : null}
               hasSingleCountry={hasSingleCountry}
-              regionalReachablePopulation={primaryCountryReach?.reachable ?? 0}
-              regionalUnreachablePopulation={primaryCountryReach?.unreachable ?? 0}
+              regionalReachablePopulation={regionalReachablePopulation}
+              regionalUnreachablePopulation={regionalUnreachablePopulation}
               gapLoading={gapLoading}
               gap={gap}
               languageMetadata={languageMetadata}
               topContributors={reach?.topContributingRegions ?? []}
               countryMetadata={countryMetadata}
-              hasCountries={hasCountries}
+              topLanguages={explore?.topLanguages ?? []}
+              exploreLoading={exploreLoading}
               onAddLanguage={addLanguage}
               onAddCountry={addCountry}
             />

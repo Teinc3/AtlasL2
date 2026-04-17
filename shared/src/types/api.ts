@@ -27,9 +27,9 @@ export const TopContributingRegionSchema = Type.Object({
   estimatedSpeakers: Type.Number({ minimum: 0 }),
 });
 
-// Explore is GET, so query concatenates all country codes with commas
-export const ExploreQuerySchema = Type.Object({
-  targets: Type.String({ minLength: 3 }),
+export const ExploreRequestSchema = Type.Object({
+  countries: Type.Array(ISO3CodeSchema),
+  languages: Type.Optional(Type.Array(ISO3CodeSchema)),
 });
 
 export const ExploreResponseSchema = Type.Object({
@@ -64,7 +64,7 @@ export const GapRecommendationSchema = Type.Object({
 
 export const GapResponseSchema = Type.Array(GapRecommendationSchema);
 
-export type ExploreQuery = Static<typeof ExploreQuerySchema>;
+export type ExploreRequest = Static<typeof ExploreRequestSchema>;
 export type RegionalDistribution = Static<typeof RegionalDistributionSchema>;
 export type ReachCountryMetrics = Static<typeof ReachCountryMetricsSchema>;
 export type TopContributingRegion = Static<typeof TopContributingRegionSchema>;

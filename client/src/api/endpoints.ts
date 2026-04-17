@@ -1,6 +1,6 @@
 import {
 	CountryMetadataMapSchema, LanguageMetadataMapSchema,
-	ExploreResponseSchema,
+	ExploreRequestSchema, ExploreResponseSchema,
 	GapRequestSchema, GapResponseSchema,
 	ReachRequestSchema, ReachResponseSchema,
 } from '@atlasl2/shared';
@@ -8,7 +8,7 @@ import { assertSchema, fetchJSON } from './fetch';
 
 import type {
 	CountryMetadataMap, LanguageMetadataMap,
-	ExploreResponse,
+	ExploreRequest, ExploreResponse,
 	GapRequest, GapResponse,
 	ReachRequest, ReachResponse,
 } from '@atlasl2/shared';
@@ -32,12 +32,16 @@ export async function fetchLanguageMetadata(init?: RequestInit): Promise<Languag
 	);
 }
 
-export async function fetchExplore(targets: string[], init?: RequestInit): Promise<ExploreResponse> {
-	const targetParam = targets.join(',');
+export async function fetchExplore(body: ExploreRequest, init?: RequestInit): Promise<ExploreResponse> {
+	assertSchema<ExploreRequest>(ExploreRequestSchema, body, 'explore request');
 	return fetchJSON<ExploreResponse>(
-		`/api/0/explore?targets=${encodeURIComponent(targetParam)}`,
+		'/api/0/explore',
 		ExploreResponseSchema,
-		init,
+		{
+			method: 'POST',
+			body: JSON.stringify(body),
+			...init,
+		},
 		'explore response'
 	);
 }
