@@ -28,11 +28,18 @@ export function AtlasProvider({ children }: { children: ReactNode }) {
 
 	const {
 		reach, gap, explore,
-		isLoadingReach: reachLoading,
-		isLoadingGap: gapLoading,
-		isLoadingExplore: exploreLoading,
-		reachError, gapError, exploreError,
+		isLoading: indicesLoading,
+		error: indicesError,
 	} = useIndices(selectedLanguages, selectedCountries);
+
+	const loading = {
+		metadata: metadataLoading,
+		reach: indicesLoading.reach,
+		gap: indicesLoading.gap,
+		explore: indicesLoading.explore,
+	};
+
+	const error = metadataError || indicesError;
 
 	const addLanguage = useCallback((lang: string) => {
 		setSelectedLanguages((prevLangs) => {
@@ -93,8 +100,8 @@ export function AtlasProvider({ children }: { children: ReactNode }) {
 				setFocusedCountryId,
 				countryMetadata, languageMetadata,
 				reach, gap, explore,
-				metadataLoading, reachLoading, gapLoading, exploreLoading,
-        metadataError, reachError, gapError, exploreError,
+				loading,
+				error,
 				isSelectPanelOpen, isInfoPanelOpen,
 				setIsSelectPanelOpen, setIsInfoPanelOpen,
 			}}

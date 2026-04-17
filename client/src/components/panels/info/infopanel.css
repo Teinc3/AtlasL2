@@ -266,6 +266,14 @@
   margin-bottom: 8px;
 }
 
+.expandableSection.nonExpandable summary {
+  cursor: default;
+}
+
+.expandableSection.nonExpandable summary::marker {
+  content: "   ";
+}
+
 .expandableLabel {
   color: #aaa;
   font-size: 0.9rem;

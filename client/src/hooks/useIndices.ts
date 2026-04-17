@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { CommunicativeMode } from '@atlasl2/shared';
 import { fetchExplore, fetchGap, fetchReach } from '../api';
@@ -11,7 +11,20 @@ const ADAPTIVE_WINDOW_MS = 5000;
 const DEBOUNCE_MS = 600;
 const IMMEDIATE_CHANGES = 3;
 const HALF_DEBOUNCE_CHANGES = 6;
+const IDLE_LOADING = {
+	reach: false,
+	gap: false,
+	explore: false,
+};
 
+
+function createLoadingState(hasLanguages: boolean, hasExplore: boolean) {
+	return {
+		reach: hasLanguages,
+		gap: hasLanguages,
+		explore: hasExplore,
+	};
+}
 
 function toErrorMessage(reason: unknown, fallback: string): string {
 	return reason instanceof Error ? reason.message : fallback;
@@ -43,47 +56,24 @@ export default function useIndices(
 	const [reach, setReach] = useState<ReachResponse | null>(null);
 	const [gap, setGap] = useState<GapResponse | null>(null);
 	const [explore, setExplore] = useState<ExploreResponse | null>(null);
-	const [isLoadingReach, setIsLoadingReach] = useState(false);
-	const [isLoadingGap, setIsLoadingGap] = useState(false);
-	const [isLoadingExplore, setIsLoadingExplore] = useState(false);
-	const [reachError, setReachError] = useState<string | null>(null);
-	const [gapError, setGapError] = useState<string | null>(null);
-	const [exploreError, setExploreError] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState(IDLE_LOADING);
+	const [error, setError] = useState<string | null>(null);
 	const requestIdRef = useRef(0);
 	const changeTimesRef = useRef<number[]>([]);
-	const languageIds = useMemo(() => selectedLanguages, [selectedLanguages]);
-	const countryIds = useMemo(() => selectedCountries, [selectedCountries]);
-	const requestKey = useMemo(
-		() => `${languageIds.join('|')}::${countryIds.join('|')}::${mode}`,
-		[languageIds, countryIds, mode]
-	);
+	const requestKey = `${selectedLanguages.join('|')}::${selectedCountries.join('|')}::${mode}`;
 	const resetAllState = useCallback(() => {
 		setReach(null);
 		setGap(null);
 		setExplore(null);
-		setReachError(null);
-		setGapError(null);
-		setExploreError(null);
-		setIsLoadingReach(false);
-		setIsLoadingGap(false);
-		setIsLoadingExplore(false);
+		setError(null);
+		setIsLoading(IDLE_LOADING);
 	}, []);
-	const setInitialLoadingAndErrors = useCallback((hasLanguages: boolean, hasExplore: boolean) => {
-		setIsLoadingReach(hasLanguages);
-		setIsLoadingGap(hasLanguages);
-		setIsLoadingExplore(hasExplore);
-		setReachError(null);
-		setGapError(null);
-		setExploreError(null);
+	const setInitialLoadingAndError = useCallback((hasLanguages: boolean, hasExplore: boolean) => {
+		setIsLoading(createLoadingState(hasLanguages, hasExplore));
+		setError(null);
 	}, []);
 	const setLoadingForDebounceWindow = useCallback((hasLanguages: boolean, hasExplore: boolean) => {
-		if (hasLanguages) {
-			setIsLoadingReach(true);
-			setIsLoadingGap(true);
-		}
-		if (hasExplore) {
-			setIsLoadingExplore(true);
-		}
+		setIsLoading(createLoadingState(hasLanguages, hasExplore));
 	}, []);
 
 	const getAdaptiveDebounceMs = useCallback(() => {
@@ -99,11 +89,11 @@ export default function useIndices(
     } else {
       return DEBOUNCE_MS;
     }
-	}, [DEBOUNCE_MS]);
+	}, []);
 
 	const loadIndices = useCallback(async (signal: AbortSignal) => {
-		const hasLanguages = languageIds.length > 0;
-		const hasCountries = countryIds.length > 0;
+		const hasLanguages = selectedLanguages.length > 0;
+		const hasCountries = selectedCountries.length > 0;
 		const hasExplore = hasLanguages || hasCountries;
 
 		if (!hasExplore) {
@@ -112,7 +102,7 @@ export default function useIndices(
 		}
 
 		const requestId = ++requestIdRef.current;
-		setInitialLoadingAndErrors(hasLanguages, hasExplore);
+		setInitialLoadingAndError(hasLanguages, hasExplore);
 
 		if (!hasLanguages) {
 			setReach(null);
@@ -122,15 +112,15 @@ export default function useIndices(
 		try {
 			const [reachResult, gapResult, exploreResult] = await Promise.allSettled([
 				hasLanguages
-					? fetchReach({ languages: languageIds, targets: countryIds, mode }, { signal })
+					? fetchReach({ languages: selectedLanguages, targets: selectedCountries, mode }, { signal })
 					: Promise.resolve(null),
 				hasLanguages
-					? fetchGap({ currentLangs: languageIds, targets: countryIds }, { signal })
+					? fetchGap({ currentLangs: selectedLanguages, targets: selectedCountries }, { signal })
 					: Promise.resolve(null),
 				hasExplore
 					? fetchExplore({
-						countries: countryIds,
-						...(hasLanguages ? { languages: languageIds } : {}),
+						countries: selectedCountries,
+						...(hasLanguages ? { languages: selectedLanguages } : {}),
 					}, { signal })
 					: Promise.resolve(null),
 			]);
@@ -143,7 +133,7 @@ export default function useIndices(
 				enabled: hasLanguages,
 				result: reachResult,
 				setValue: setReach,
-				setError: setReachError,
+				setError: (message) => setError((currentError) => currentError ?? message),
 				errorFallback: 'Failed to load reach data',
 			});
 
@@ -151,7 +141,7 @@ export default function useIndices(
 				enabled: hasLanguages,
 				result: gapResult,
 				setValue: setGap,
-				setError: setGapError,
+				setError: (message) => setError((currentError) => currentError ?? message),
 				errorFallback: 'Failed to load gap data',
 			});
 
@@ -159,21 +149,19 @@ export default function useIndices(
 				enabled: hasExplore,
 				result: exploreResult,
 				setValue: setExplore,
-				setError: setExploreError,
+				setError: (message) => setError((currentError) => currentError ?? message),
 				errorFallback: 'Failed to load explore data',
 			});
 		} finally {
 			if (!signal.aborted && requestId === requestIdRef.current) {
-				setIsLoadingReach(false);
-				setIsLoadingGap(false);
-				setIsLoadingExplore(false);
+				setIsLoading(IDLE_LOADING);
 			}
 		}
-	}, [languageIds, countryIds, mode, resetAllState, setInitialLoadingAndErrors]);
+	}, [selectedLanguages, selectedCountries, mode, resetAllState, setInitialLoadingAndError]);
 
 	useEffect(() => {
-		const hasLanguages = languageIds.length > 0;
-		const hasExplore = hasLanguages || countryIds.length > 0;
+		const hasLanguages = selectedLanguages.length > 0;
+		const hasExplore = hasLanguages || selectedCountries.length > 0;
 
 		if (hasExplore) {
 			// Mark loading immediately when a new request cycle begins (including debounce period)
@@ -189,18 +177,10 @@ export default function useIndices(
 			controller.abort();
 			clearTimeout(timeoutId);
 		};
-	}, [requestKey, loadIndices, languageIds, countryIds, getAdaptiveDebounceMs, setLoadingForDebounceWindow]);
-
-	const refetch = useCallback(async () => {
-		const controller = new AbortController();
-		await loadIndices(controller.signal);
-	}, [loadIndices]);
+	}, [requestKey, loadIndices, selectedLanguages, selectedCountries, getAdaptiveDebounceMs, setLoadingForDebounceWindow]);
 
 	return {
 		reach, gap, explore,
-		isLoadingReach, isLoadingGap, isLoadingExplore,
-		reachError, gapError, exploreError,
-		refetchReach: refetch,
-		refetchGap: refetch,
+		isLoading, error
 	};
 }

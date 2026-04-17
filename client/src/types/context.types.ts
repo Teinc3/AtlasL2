@@ -28,17 +28,17 @@ export default interface AtlasContextType {
   // Metadata
   countryMetadata: CountryMetadataMap;
   languageMetadata: LanguageMetadataMap;
-  metadataLoading: boolean;
-  metadataError: string | null;
+
+  loading: {
+    metadata: boolean;
+    reach: boolean;
+    gap: boolean;
+    explore: boolean;
+  };
+  error: string | null;
 
   // API indices
   reach: ReachResponse | null;
   gap: GapResponse | null;
   explore: ExploreResponse | null;
-  reachLoading: boolean;
-  gapLoading: boolean;
-  exploreLoading: boolean;
-  reachError: string | null;
-  gapError: string | null;
-  exploreError: string | null;
 }

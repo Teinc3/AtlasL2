@@ -18,7 +18,7 @@ export default function SelectPanel(props: BasePanelProps) {
     selectedCountries: countries, 
     countryMetadata,
     languageMetadata,
-    metadataLoading,
+    loading,
     addLanguage,
     addCountry,
     removeLanguage, 
@@ -70,7 +70,7 @@ export default function SelectPanel(props: BasePanelProps) {
           <h3>Active Languages</h3>
           <SearchDropdown
             value={languageQuery}
-            placeholder={metadataLoading ? "Loading languages..." : "Search languages..."}
+            placeholder={loading.metadata ? "Loading languages..." : "Search languages..."}
             options={languageOptions}
             onQueryChange={setLanguageQuery}
             onSelect={handleLanguageSelect}
@@ -89,7 +89,7 @@ export default function SelectPanel(props: BasePanelProps) {
           <h3>Selected Regions</h3>
           <SearchDropdown
             value={countryQuery}
-            placeholder={metadataLoading ? "Loading regions..." : "Search regions..."}
+            placeholder={loading.metadata ? "Loading regions..." : "Search regions..."}
             options={countryOptions}
             onQueryChange={setCountryQuery}
             onSelect={handleCountrySelect}
