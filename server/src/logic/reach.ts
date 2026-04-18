@@ -8,13 +8,14 @@ import type { AppData } from '../types';
 
 
 export function buildReachResponse(dataStore: AppData, body: ReachRequest): ReachResponse {
-  return computeReach(dataStore, body.languages, body.targets);
+  return computeReach(dataStore, body.languages, body.targets, true);
 }
 
 export function computeReach(
   dataStore: AppData,
   languages: ReachRequest['languages'],
-  targets: ReachRequest['targets']
+  targets: ReachRequest['targets'],
+  useMutualIntelligibility: boolean = false
 ) {
   const selectedTargets = targets.length > 0
     ? targets
@@ -31,7 +32,7 @@ export function computeReach(
       continue;
     }
 
-    const reach = buildCountryReach(dataStore, target, languages);
+    const reach = buildCountryReach(dataStore, target, languages, useMutualIntelligibility);
     const reachable = toSigFig(country.population * reach);
     const unreachable = toSigFig(Math.max(0, country.population - (country.population * reach)));
 

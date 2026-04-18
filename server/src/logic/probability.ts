@@ -15,7 +15,8 @@ export function calculateIndependentReach(probabilities: number[]): number {
 export function buildCountryReach(
   dataStore: AppData,
   countryCode: string,
-  languages: ReachRequest['languages']
+  languages: ReachRequest['languages'],
+  useMutualIntelligibility: boolean = false
 ): number {
   const country = dataStore.countryMetadata[countryCode];
   if (!country) {
@@ -23,8 +24,29 @@ export function buildCountryReach(
   }
 
   const countryLangMap = dataStore.combinedData.countries[countryCode] ?? {};
-  const probabilities = languages.map((languageCode) => {
-    return normalizePrevalence(countryLangMap[languageCode] ?? 0, country.population);
+  const probabilities = Object.entries(countryLangMap).map(([languageCode, speakers]) => {
+    // For each language in the country
+    // First check if the language itself is selected
+    if (languages.includes(languageCode)) {
+      return normalizePrevalence(speakers, country.population);
+    }
+    
+    if (useMutualIntelligibility) {
+      // if not, check all related languages of that language
+      // And find the language in relationmap that we have selected that has the highest score
+      const relatedLanguages = dataStore.relationMap[languageCode] ?? {};
+      const relatedLangScores = Object.entries(relatedLanguages)
+        .filter(([relatedLang]) => languages.includes(relatedLang))
+        .map(([, score]) => score);
+      
+      if (relatedLangScores.length > 0) {
+        const maxLangRelation = Math.max(...relatedLangScores);
+        return normalizePrevalence(speakers, country.population, maxLangRelation);
+      }
+    }
+
+    // No relation, return 0
+    return 0;
   });
 
   return calculateIndependentReach(probabilities);
