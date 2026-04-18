@@ -4,9 +4,10 @@ import { Static, Type } from '@sinclair/typebox';
 const ISO3CodeSchema = Type.String({ pattern: '^[A-Z]{3}$' });
 
 export enum CommunicativeMode {
-  Active = 'Active',
-  Reception = 'Reception',
-  Broadcast = 'Broadcast',
+  None,
+  Active,
+  Reception,
+  Broadcast
 }
 
 export const RegionalDistributionSchema = Type.Object({

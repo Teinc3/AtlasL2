@@ -1,3 +1,4 @@
+import { CommunicativeMode } from '@atlasl2/shared';
 import { computeReach } from './reach';
 import { toSigFig } from '../utils';
 
@@ -8,7 +9,9 @@ import type { AppData } from '../types';
 export function buildGapResponse(dataStore: AppData, body: GapRequest): GapResponse {
   const excludedLangs = new Set(body.currentLangs);
   const limit = body.limit ?? 5;
-  const baseReach = computeReach(dataStore, body.currentLangs, body.targets).globalIndex;
+  const baseReach = computeReach(
+    dataStore, body.currentLangs, body.targets, CommunicativeMode.None
+  ).globalIndex;
   const selectedTargets = body.targets.length > 0 
     ? body.targets
     : Object.keys(dataStore.countryMetadata);
@@ -23,7 +26,8 @@ export function buildGapResponse(dataStore: AppData, body: GapRequest): GapRespo
       const potentialReach = computeReach(
         dataStore,
         [...body.currentLangs, language.id],
-        body.targets
+        body.targets,
+        CommunicativeMode.None
       ).globalIndex;
 
       const marginalGain = Math.max(0, potentialReach - baseReach);

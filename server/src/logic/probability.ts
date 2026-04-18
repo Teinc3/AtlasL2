@@ -1,3 +1,4 @@
+import { CommunicativeMode } from '@atlasl2/shared';
 import { normaliseProbability, normalizePrevalence } from '../utils';
 
 import type { ReachRequest } from '@atlasl2/shared';
@@ -16,7 +17,7 @@ export function buildCountryReach(
   dataStore: AppData,
   countryCode: string,
   languages: ReachRequest['languages'],
-  useMutualIntelligibility: boolean = false
+  mode: CommunicativeMode
 ): number {
   const country = dataStore.countryMetadata[countryCode];
   if (!country) {
@@ -31,14 +32,26 @@ export function buildCountryReach(
       return normalizePrevalence(speakers, country.population);
     }
     
-    if (useMutualIntelligibility) {
+    if (mode !== CommunicativeMode.None) {
       // if not, check all related languages of that language
       // And find the language in relationmap that we have selected that has the highest score
       const relatedLanguages = dataStore.relationMap[languageCode] ?? {};
       const relatedLangScores = Object.entries(relatedLanguages)
         .filter(([relatedLang]) => languages.includes(relatedLang))
-        .map(([, score]) => score);
-      
+        .map(([relatedLang, score]) => {
+          // Score is the UPSTREAM weight (So return if Broadcast)
+          // Lookup the DOWNSTREAM weight for the same language pair (if Active or Reception)
+          if (mode === CommunicativeMode.Broadcast) {
+            return score;
+          }
+          const downstreamScore = dataStore.relationMap[relatedLang]?.[languageCode] ?? 0;
+          if (mode === CommunicativeMode.Active) {
+            return Math.min(score, downstreamScore);
+          } else {
+            return downstreamScore;
+          }
+        });
+
       if (relatedLangScores.length > 0) {
         const maxLangRelation = Math.max(...relatedLangScores);
         return normalizePrevalence(speakers, country.population, maxLangRelation);

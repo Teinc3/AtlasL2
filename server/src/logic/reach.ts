@@ -1,3 +1,4 @@
+import { CommunicativeMode } from '@atlasl2/shared';
 import { buildCountryReach } from './probability';
 import { toSigFig } from '../utils';
 
@@ -8,14 +9,14 @@ import type { AppData } from '../types';
 
 
 export function buildReachResponse(dataStore: AppData, body: ReachRequest): ReachResponse {
-  return computeReach(dataStore, body.languages, body.targets, true);
+  return computeReach(dataStore, body.languages, body.targets, body.mode);
 }
 
 export function computeReach(
   dataStore: AppData,
   languages: ReachRequest['languages'],
   targets: ReachRequest['targets'],
-  useMutualIntelligibility: boolean = false
+  mode: CommunicativeMode
 ) {
   const selectedTargets = targets.length > 0
     ? targets
@@ -32,7 +33,7 @@ export function computeReach(
       continue;
     }
 
-    const reach = buildCountryReach(dataStore, target, languages, useMutualIntelligibility);
+    const reach = buildCountryReach(dataStore, target, languages, mode);
     const reachable = toSigFig(country.population * reach);
     const unreachable = toSigFig(Math.max(0, country.population - (country.population * reach)));
 
