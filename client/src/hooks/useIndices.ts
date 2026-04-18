@@ -51,7 +51,7 @@ export default function useIndices(
 	selectedCountries: string[],
 	mode?: CommunicativeMode
 ) {
-  mode ??= CommunicativeMode.Active;
+  mode ??= CommunicativeMode.None;
 
 	const [reach, setReach] = useState<ReachResponse | null>(null);
 	const [gap, setGap] = useState<GapResponse | null>(null);

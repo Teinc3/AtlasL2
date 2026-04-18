@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+import { CommunicativeMode } from "@atlasl2/shared";
 import SearchDropdown from "../../search";
 import { useAtlasContext } from "../../../context";
 import {
@@ -19,10 +20,12 @@ export default function SelectPanel(props: BasePanelProps) {
     countryMetadata,
     languageMetadata,
     loading,
+    mutualIntelligibilityMode,
     addLanguage,
     addCountry,
     removeLanguage, 
     removeCountry,
+    setMutualIntelligibilityMode,
     isSelectPanelOpen: isOpen,
     setIsSelectPanelOpen: setIsOpen
   } = useAtlasContext();
@@ -102,6 +105,21 @@ export default function SelectPanel(props: BasePanelProps) {
               </span>
             ))}
           </div>
+        </div>
+
+        <div className="section modeRow">
+          <label className="modeLabel" htmlFor="mutualIntelligibilityMode">Mutual Intelligibility:</label>
+          <select
+            id="mutualIntelligibilityMode"
+            className="modeSelect"
+            value={mutualIntelligibilityMode}
+            onChange={(event) => setMutualIntelligibilityMode(Number(event.target.value) as CommunicativeMode)}
+          >
+            <option value={CommunicativeMode.None}>None</option>
+            <option value={CommunicativeMode.Active}>Conversation</option>
+            <option value={CommunicativeMode.Reception}>Reception</option>
+            <option value={CommunicativeMode.Broadcast}>Broadcast</option>
+          </select>
         </div>
       </div>
     </div>

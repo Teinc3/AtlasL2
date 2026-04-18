@@ -2,6 +2,7 @@ import {
 	createContext, useCallback, useContext, useState,
 	type ReactNode
 } from 'react';
+import { CommunicativeMode } from '@atlasl2/shared';
 
 import { useIndices, useMetadata } from '../hooks';
 
@@ -22,6 +23,8 @@ export function AtlasProvider({ children }: { children: ReactNode }) {
 	const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
 	const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
 	const [focusedCountryId, setFocusedCountryId] = useState<string | null>(null);
+	const [mutualIntelligibilityMode, setMutualIntelligibilityMode]
+    = useState<CommunicativeMode>(CommunicativeMode.None);
 
 	const [isSelectPanelOpen, setIsSelectPanelOpen] = useState<boolean>(true);
 	const [isInfoPanelOpen, setIsInfoPanelOpen] = useState<boolean>(false);
@@ -30,7 +33,7 @@ export function AtlasProvider({ children }: { children: ReactNode }) {
 		reach, gap, explore,
 		isLoading: indicesLoading,
 		error: indicesError,
-	} = useIndices(selectedLanguages, selectedCountries);
+	} = useIndices(selectedLanguages, selectedCountries, mutualIntelligibilityMode);
 
 	const loading = {
 		metadata: metadataLoading,
@@ -95,6 +98,8 @@ export function AtlasProvider({ children }: { children: ReactNode }) {
 				selectedLanguages, selectedCountries,
 				setSelectedCountries: handleSetSelectedCountries,
 				addLanguage, removeLanguage,
+				mutualIntelligibilityMode,
+				setMutualIntelligibilityMode,
 				addCountry, removeCountry,
 				focusedCountryId,
 				setFocusedCountryId,

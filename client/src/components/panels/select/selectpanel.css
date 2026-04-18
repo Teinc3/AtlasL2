@@ -77,6 +77,33 @@
   color: var(--dimmed-white);
 }
 
+.modeRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.modeLabel {
+  color: var(--dimmed-white);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.modeSelect {
+  flex: 1;
+  padding: 0.3rem 0 0.3rem 0.5rem;
+  background: var(--bg-dark);
+  color: white;
+  border: 1px solid #555;
+  border-radius: 6px;
+}
+
+.modeSelect:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
 .chips {
   display: flex;
   flex-wrap: wrap;
