@@ -5,6 +5,10 @@ import babel from '@rolldown/plugin-babel'
 // https://vite.dev/config/
 export default defineConfig({
   envDir: '..',
+  build: {
+    outDir: '../dist/client',
+    emptyOutDir: true,
+  },
   server: {
     proxy: {
       '/api': {

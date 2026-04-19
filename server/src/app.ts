@@ -1,7 +1,7 @@
 import Fastify from 'fastify';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 
-import { dataStorePlugin, requestLoggerPlugin } from './plugins';
+import { clientPlugin, dataStorePlugin, requestLoggerPlugin } from './plugins';
 import { apiRoutes, metadataRoutes } from './routes';
 
 
@@ -15,5 +15,6 @@ export async function buildApp() {
   await app.register(requestLoggerPlugin);
   await app.register(metadataRoutes);
   await app.register(apiRoutes);
+  await app.register(clientPlugin);
   return app;
 }

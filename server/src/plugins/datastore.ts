@@ -1,6 +1,5 @@
 import { readFile } from 'fs/promises';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import fastifyPlugin from 'fastify-plugin';
 
 import type {
@@ -8,9 +7,7 @@ import type {
 } from '@atlasl2/shared';
 
 
-const currentFileDir = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(currentFileDir, '..', '..', '..');
-
+const repoRoot = path.resolve(process.cwd(), '..');
 const countryMetadataPath = path.join(repoRoot, 'data/country_metadata.json');
 const languageMetadataPath = path.join(repoRoot, 'data/language_metadata.json');
 const combinedDataPath = path.join(repoRoot, 'data/combined_data.json');

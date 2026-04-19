@@ -3,21 +3,21 @@
   "description": "An interactive data engineering project showcasing L2 communicability across the world with a user-selected combination of languages.",
   "version": "0.0.0",
   "private": true,
-  "workspaces": [
-    "client",
-    "server",
-    "shared"
-  ],
+  "workspaces": ["client", "server", "shared"],
   "scripts": {
     "lint": "eslint .",
     "dev:client": "npm run dev -w @atlasl2/client",
     "dev:server": "npm run dev -w @atlasl2/server",
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "npm run build -w @atlasl2/client",
+    "build:server": "npm run build -w @atlasl2/server",
     "data": "npm run data:combine && npm run data:expand && npm run data:metadata",
     "data:combine": "tsx --tsconfig scripts/tsconfig.scripts.json scripts/combine_datasets.ts",
     "data:expand": "tsx --tsconfig scripts/tsconfig.scripts.json scripts/expand_edges.ts",
     "data:metadata": "tsx --tsconfig scripts/tsconfig.scripts.json scripts/generate_metadata.ts",
-    "data:delete": "cd data && rm -f combined_data.json combined_languages.json country_metadata.json language_metadata.json relation_map.json"
+    "data:delete": "cd data && rm -f combined_data.json combined_languages.json country_metadata.json language_metadata.json relation_map.json",
+    "start": "npm run start -w @atlasl2/server"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

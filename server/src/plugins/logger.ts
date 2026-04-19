@@ -1,12 +1,10 @@
 import { createWriteStream } from 'node:fs';
 import { access, mkdir, rename, rm } from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import fastifyPlugin from 'fastify-plugin';
 
 
-const currentFileDir = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(currentFileDir, '..', '..', '..');
+const repoRoot = path.resolve(process.cwd(), '..');
 
 const logsDir = path.join(repoRoot, 'logs');
 const requestsLogPath = path.join(logsDir, 'requests.log');

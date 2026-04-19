@@ -3,13 +3,6 @@ import { Value } from '@sinclair/typebox/value';
 import type { TSchema } from '@sinclair/typebox';
 
 
-const API_BASE_URL = import.meta.env.DEV ? '' : (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '');
-
-
-function buildUrl(path: string): string {
-	return `${API_BASE_URL}${path}`;
-}
-
 export function assertSchema<T>(schema: TSchema, payload: unknown, name: string): T {
 	if (!Value.Check(schema, payload)) {
 		throw new Error(`Invalid ${name} payload`);
@@ -20,7 +13,7 @@ export function assertSchema<T>(schema: TSchema, payload: unknown, name: string)
 export async function fetchJSON<T>(
 	path: string, schema: TSchema, init?: RequestInit, name = 'response'
 ): Promise<T> {
-	const response = await fetch(buildUrl(path), {
+	const response = await fetch(path, {
 		headers: {
 			'content-type': 'application/json',
 			...(init?.headers ?? {}),
