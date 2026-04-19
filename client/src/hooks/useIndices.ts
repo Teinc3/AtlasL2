@@ -115,7 +115,7 @@ export default function useIndices(
 					? fetchReach({ languages: selectedLanguages, targets: selectedCountries, mode }, { signal })
 					: Promise.resolve(null),
 				hasLanguages
-					? fetchGap({ currentLangs: selectedLanguages, targets: selectedCountries }, { signal })
+					? fetchGap({ currentLangs: selectedLanguages, targets: selectedCountries, mode }, { signal })
 					: Promise.resolve(null),
 				hasExplore
 					? fetchExplore({

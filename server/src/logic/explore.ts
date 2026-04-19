@@ -4,14 +4,6 @@ import type { ExploreRequest, ExploreResponse, RegionalDistribution } from '@atl
 import type { AppData } from '../types';
 
 
-export function findUnknownCountries(dataStore: AppData, countries: string[]): string[] {
-  return countries.filter((countryCode) => !dataStore.countryMetadata[countryCode]);
-}
-
-export function findUnknownLanguages(dataStore: AppData, languages: string[]): string[] {
-  return languages.filter((languageCode) => !dataStore.languageMetadata[languageCode]);
-}
-
 function sumCountryPopulation(dataStore: AppData, countries: string[]): number {
   return countries.reduce((sum, countryCode) => {
     const country = dataStore.countryMetadata[countryCode];
@@ -25,7 +17,8 @@ function sumLangSpeakers(dataStore: AppData, languageCode: string, countries: st
   }, 0);
 }
 
-export function buildExploreResponse(dataStore: AppData, body: ExploreRequest): ExploreResponse {
+
+export default function buildExploreResponse(dataStore: AppData, body: ExploreRequest): ExploreResponse {
   const selectedCountries = body.countries.length > 0 ? body.countries : Object.keys(dataStore.countryMetadata);
   const selectedLanguages = body.languages ?? []
   const selectedPopulation = sumCountryPopulation(dataStore, selectedCountries);

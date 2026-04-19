@@ -18,12 +18,9 @@ export function computeReach(
   targets: ReachRequest['targets'],
   mode: CommunicativeMode
 ) {
-  const selectedTargets = targets.length > 0
-    ? targets
-    : Object.keys(dataStore.countryMetadata);
-
   const breakdown: Record<string, ReachCountryMetrics> = {};
   const topContributingRegions: TopContributingRegion[] = [];
+  const selectedTargets = targets.length > 0 ? targets : Object.keys(dataStore.countryMetadata);
   let weightedTotal = 0;
   let totalPopulation = 0;
 

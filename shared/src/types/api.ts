@@ -53,7 +53,7 @@ export const ReachResponseSchema = Type.Object({
 export const GapRequestSchema = Type.Object({
   currentLangs: Type.Array(ISO3CodeSchema, { minItems: 1 }),
   targets: Type.Array(ISO3CodeSchema),
-  limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 10 })),
+  mode: Type.Enum(CommunicativeMode),
 });
 
 export const GapRecommendationSchema = Type.Object({
