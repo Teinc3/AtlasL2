@@ -1,7 +1,7 @@
 {
   "name": "atlasl2",
   "description": "An interactive data engineering project showcasing L2 communicability across the world with a user-selected combination of languages.",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "workspaces": ["client", "server", "shared"],
   "scripts": {
