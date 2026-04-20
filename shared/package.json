@@ -1,7 +1,7 @@
 {
   "name": "@atlasl2/shared",
   "description": "Shared utilities and types consumed by the client and server workspaces",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "type": "module",
   "private": true,
   "exports": {

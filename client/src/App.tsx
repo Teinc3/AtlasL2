@@ -67,7 +67,7 @@ export default function App() {
       <div className="mapContainer">
         <Map
           ref={mapRef}
-          mapStyle={'/basemap-data.style.json'}
+          mapStyle={`${import.meta.env.BASE_URL}basemap-data.style.json`}
           initialViewState={{
             longitude: 22,
             latitude: 27,

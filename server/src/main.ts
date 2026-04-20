@@ -1,6 +1,9 @@
+import { config } from 'dotenv';
+
 import { buildApp } from './app';
 
 
+config({ path: '../.env' });
 const port = Number(process.env.API_SERVER_PORT ?? 8000);
 const host = process.env.HOST ?? '0.0.0.0';
 

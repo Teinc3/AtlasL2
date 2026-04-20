@@ -1,7 +1,7 @@
 {
   "name": "@atlasl2/client",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.2",
   "type": "module",
   "exports": null,
   "scripts": {
@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@atlasl2/shared": "^0.1.0",
+    "@atlasl2/shared": "^0.1.2",
     "@deck.gl/geo-layers": "^9.2.11",
     "@deck.gl/layers": "^9.2.11",
     "@deck.gl/react": "^9.2.11",

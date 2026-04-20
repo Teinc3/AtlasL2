@@ -1,6 +1,6 @@
 {
   "name": "@atlasl2/server",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "type": "module",
   "private": true,
   "exports": null,
@@ -10,9 +10,10 @@
     "start": "node ../dist/server/main.cjs"
   },
   "dependencies": {
-    "@atlasl2/shared": "^0.1.0",
+    "@atlasl2/shared": "^0.1.2",
     "@fastify/static": "^9.1.1",
     "@fastify/type-provider-typebox": "^6.1.0",
+    "dotenv": "^16.3.1",
     "fastify": "^5.8.4",
     "fastify-plugin": "^5.1.0"
   },
