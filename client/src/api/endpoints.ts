@@ -4,7 +4,7 @@ import {
 	GapRequestSchema, GapResponseSchema,
 	ReachRequestSchema, ReachResponseSchema,
 } from '@atlasl2/shared';
-import { assertSchema, fetchJSON } from './fetch';
+import { assertSchema, buildClientPath, fetchJSON } from './fetch';
 
 import type {
 	CountryMetadataMap, LanguageMetadataMap,
@@ -16,7 +16,7 @@ import type {
 
 export async function fetchCountryMetadata(init?: RequestInit): Promise<CountryMetadataMap> {
 	return fetchJSON<CountryMetadataMap>(
-		'/static/metadata/country_metadata.json',
+		buildClientPath('static/metadata/country_metadata.json'),
 		CountryMetadataMapSchema,
 		init,
 		'country metadata'
@@ -25,7 +25,7 @@ export async function fetchCountryMetadata(init?: RequestInit): Promise<CountryM
 
 export async function fetchLanguageMetadata(init?: RequestInit): Promise<LanguageMetadataMap> {
 	return fetchJSON<LanguageMetadataMap>(
-		'/static/metadata/language_metadata.json',
+		buildClientPath('static/metadata/language_metadata.json'),
 		LanguageMetadataMapSchema,
 		init,
 		'language metadata'
@@ -35,7 +35,7 @@ export async function fetchLanguageMetadata(init?: RequestInit): Promise<Languag
 export async function fetchExplore(body: ExploreRequest, init?: RequestInit): Promise<ExploreResponse> {
 	assertSchema<ExploreRequest>(ExploreRequestSchema, body, 'explore request');
 	return fetchJSON<ExploreResponse>(
-		'/api/0/explore',
+		buildClientPath('api/0/explore'),
 		ExploreResponseSchema,
 		{
 			method: 'POST',
@@ -49,7 +49,7 @@ export async function fetchExplore(body: ExploreRequest, init?: RequestInit): Pr
 export async function fetchReach(body: ReachRequest, init?: RequestInit): Promise<ReachResponse> {
 	assertSchema<ReachRequest>(ReachRequestSchema, body, 'reach request');
 	return fetchJSON<ReachResponse>(
-		'/api/0/reach',
+		buildClientPath('api/0/reach'),
 		ReachResponseSchema,
 		{
 			method: 'POST',
@@ -63,7 +63,7 @@ export async function fetchReach(body: ReachRequest, init?: RequestInit): Promis
 export async function fetchGap(body: GapRequest, init?: RequestInit): Promise<GapResponse> {
 	assertSchema<GapRequest>(GapRequestSchema, body, 'gap request');
 	return fetchJSON<GapResponse>(
-		'/api/0/gap',
+		buildClientPath('api/0/gap'),
 		GapResponseSchema,
 		{
 			method: 'POST',

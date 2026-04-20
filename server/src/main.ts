@@ -1,7 +1,7 @@
 import { buildApp } from './app';
 
 
-const port = Number(process.env.PORT ?? 8000);
+const port = Number(process.env.API_SERVER_PORT ?? 8000);
 const host = process.env.HOST ?? '0.0.0.0';
 
 async function start() {
