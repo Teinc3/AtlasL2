@@ -1,0 +1,29 @@
+name: Build and Deploy Application
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up SSH Agent
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.OVH_SSH_KEY }}
+
+      - name: Deploy via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.OVH_USER }}@teinc3.net << EOF
+            cd AtlasL2
+            git fetch --tags --force origin 
+            git checkout ${{ github.ref_name }}
+            docker compose rm -sf server
+            docker compose build --no-cache server
+            docker compose up -d server
+          EOF

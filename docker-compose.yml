@@ -1,0 +1,12 @@
+services: 
+  server:
+    build: .
+    ports:
+      - "3713:3713"
+    container_name: atlasl2-server
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    env_file:
+      - .env
+    restart: unless-stopped
