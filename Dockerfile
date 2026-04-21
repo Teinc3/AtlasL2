@@ -21,6 +21,9 @@ COPY client/public client/public
 COPY server/src server/src
 COPY shared/src shared/src
 
+# For the vite base path
+COPY .env ./.env
+
 RUN npm run build
 
 # Create logs directory to ensure it exists for the volume mount
